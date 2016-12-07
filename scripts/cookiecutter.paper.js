@@ -236,6 +236,23 @@ var clickedPoint ;
 function onMouseDown(event) {
     if (mode == "ADD") {
 
+        if(event.event.button == 2)
+        {
+            
+            cookieCutterPath.strokeColor = blackColor;
+            startPoint.visible = false;
+            stickyMouse.visible = false;
+            cookieCutterPath.add(event.point);
+
+            paths.push(cookieCutterPath.clone());
+            cookieCutterPath.remove();
+            paper.restart();
+            setMode("EDIT");
+            
+            return;
+
+        }
+
         var closingPath = startPoint.hitTest(event.point, hitOptions);
         if (closingPath) {
             cookieCutterPath.closed = true;
