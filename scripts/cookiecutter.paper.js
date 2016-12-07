@@ -248,7 +248,7 @@ function onMouseDown(event) {
             cookieCutterPath.remove();
             paper.restart();
             setMode("EDIT");
-            
+
             return;
 
         }
@@ -618,7 +618,7 @@ function onKeyUp(event) {
                     strokeWidth: 3,
                     selected: false,
                     strokeJoin: "round",
-                    closed: true});
+                    closed: paths[i].closed});
 
                     paths[i].remove();
                     paths[i] =p;
