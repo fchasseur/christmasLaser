@@ -1,16 +1,5 @@
-/* Objects initialization */
 
-var segment;
-var selfIntersectionCount = 0;
-var flattenValue = 50;
-var currentIndex = 0;
-var stWidth = 5;
 
-var group;
-var cookieCutterPath;
-var grid = null;
-var raster = null;
-var scale = 1;
 
 var hitOptions = {
     segments: true,
@@ -19,734 +8,553 @@ var hitOptions = {
     tolerance: 1
 };
 
-paper.settings.handleSize = 15;
-var startPoint;
-var stickyMouse;
-var textItem2;
-
-var btnRestart = new Path.Rectangle();
-var redCircleGroup ;
-
-var paths = [];
-
-
- var whiteColor = 
-{
-   red : 1,
-   blue : 1,
-   green: 1,
-   alpha: 0.5
+var pathMeta = {
+    laserType: {name: 'Type', group: '', type: 'options', options: [ {text:'Applat', value: 'applat'} , {text:'Decoupe', value: 'cut'},{text:'Gravure', value: 'engraving'}] },
+    strokeWidth: {name: "Epaisseur", group:'', type: 'options', options:  [{ text:"1", value: '5'},{ text:"2", value: '7'},{ text:"3", value: '10'},{ text:"4", value: '15'}] }
 };
 
+commonPathUpdate = function (val)
+ {
+ 	var p = this;
+	p.laserType =val.laserType;
+	p.strokeWidth = val.strokeWidth;
+	switch (p.laserType)
+	{
+		case "cut":
+			p.strokeColor = 'red';
+			p.fillColor = 'white';
+			p.strokeWidth = 5;
+		break;
 
- var blackColor = 
-{
-   red : 0,
-   blue : 0,
-   green: 0,
-   alpha: 0.5
+		case "applat":
+			p.strokeColor = 'black';
+			p.fillColor = "black";
+		break
+		case "engraving":
+			p.strokeColor = 'black';
+			p.fillColor = "white";
+		break;
+
+	} 
+	p.toolValues = val;
+ }
+
+
+
+var path;
+//------------------------------------------------------------------------------
+var penTool = new Tool();
+
+penTool.meta = pathMeta ; 
+penTool.toolValues =  {
+	laserType:"applat",
+	strokeWidth:1
+}
+
+penTool.updateObj = commonPathUpdate ; 
+penTool.onMouseDown = function (event) {
+	path = new Path();
+	path.meta = penTool.meta;
+	path.toolValues =penTool.toolValues;
+
+	path.updateObj = penTool.updateObj;
+	var val = $('#propGrid').jqPropertyGrid('get'); 
+	path.updateObj(val);
+
+	path.add(event.point);
 };
 
-
-paper.loadImage = function(img){
-    handleImage(img);
-};
-paper.clearAndRestart= function (){
-
-   project.activeLayer.removeChildren()
-
-   paper.restart();
-   
+penTool.onMouseDrag = function(event) {
+	path.add(event.point);
 }
-paper.downloadAsSVG = function(fileName) {
-
-    if (!fileName) {
-        fileName = "paperjs_example.svg"
-    }
-
-    var url = "data:image/svg+xml;utf8," + encodeURIComponent(paper.project.exportSVG({
-        asString: true
-    }));
-
-    var link = document.createElement("a");
-    link.download = fileName;
-    link.href = url;
-    link.click();
-}
-
-paper.restart = function() {
-
-   
-    /*if(raster)
-    {
-        raster.remove();
-        raster = null;
-    }*/
-    if(cookieCutterPath)
-    {
-        cookieCutterPath.remove();
-    }
-    cookieCutterPath = new Path({
-        strokeColor: "#FF0000",
-        strokeWidth: 3,
-        selected: false,
-        strokeJoin: "round",
-        strokeCap: "round"
-    });
-
-
-    if (startPoint) {
-        startPoint.remove();
-
-    }
-    startPoint = new Path.Circle({
-        center: new Point(20, 20),
-        radius: 10,
-        fillColor: "#FF0000",
-        visible: false,
-        selected:false
-    });;
-
-
-    if (stickyMouse) {
-        stickyMouse.remove();
-
-    }
-    stickyMouse = new Path([new Point(-10, -10), new Point(-10, -30), ]);
-    stickyMouse.strokeColor = "#FF0000";
-    stickyMouse.strokeWidth = 3;
-    stickyMouse.selected = false;
-    stickyMouse.strokeJoin = "round";
-    stickyMouse.strokeCap = "round";
-    stickyMouse.sendToBack();
-
-    if (textItem2) {
-        textItem2.remove();
-    }
-    textItem2 = new PointText({
-        content: "",
-        point: new Point(20, 70),
-        fillColor: 'white',
-        fontSize: '20'
-    });
-
-    if (redCircleGroup) {
-        redCircleGroup.remove();
-    }
-    redCircleGroup = new Group();
-
-    if(raster)
-    {
-        raster.sendToBack();
-        
-    }
-    if(mode != "ADD")
-        setMode("ADD");
-}
-
-paper.restart();
-
-
-/* Mouse events and interactions */
-function onMouseMove(event) {
-
-
-    if (mode == "EDIT")
-    {
-       
-
-       
-    }
-
-    if (mode == "ADD") {
-        
-          unSelectAll();
-          if (startPoint.visible && cookieCutterPath && cookieCutterPath.lastSegment) {
-            stickyMouse.firstSegment.point = cookieCutterPath.lastSegment.point;
-            stickyMouse.lastSegment.point = event.point;
-
-
-            var closingPath = startPoint.hitTest(event.point, hitOptions);
-            if (closingPath) {
-                startPoint.fillColor = "#FF0000";
-                cookieCutterPath.strokeColor = "#FF0000";
-
-
-            } else {
-                var intersectionCount = stickyMouse.getIntersections(cookieCutterPath).length;
-
-                if (intersectionCount < 2) {
-                    startPoint.fillColor = "#FF0000";
-                    cookieCutterPath.strokeColor = "#FF0000";
-
-                } else {
-                    startPoint.fillColor = "grey";
-                    cookieCutterPath.strokeColor = "grey";
-                }
-            }
-        }
-
-        
-
-
-    }
-    if(mode == "DELETE")
-    {
-        if (cookieCutterPath )
-         cookieCutterPath.remove();
-        if (stickyMouse) 
-            stickyMouse.remove();
-        if (startPoint) 
-            startPoint.remove();
-
-
-        project.activeLayer.selected = false;
-        if (event.item)
-            event.item.selected = true;
-    }
-    if(mode == "EDIT")
-    {
-        if( cookieCutterPath )
-        {
-            stickyMouse.remove();
-            startPoint.remove();
-            cookieCutterPath.remove();
-        }
-        if (event.item )
-         {  
-            unSelectAll();
-            event.item.selected = true;
-         }
-
-    }
-
-
-}
-function unSelectAll()
+penTool.onMouseUp = function (event)
 {
-    for(var i = 0 ; i < paths.length; i++)
-            {
-                  paths[i].selected = false;
-            }
+	path.simplify(10);
+	selectTool.activate();
+	window.toolHasChanged(selectTool.meta, selectTool.toolValues)
 }
 
-var clickedItem ;
-var clickedPoint ;
-
-function onMouseDown(event) {
-    if (mode == "ADD") {
-
-        if(event.event.button == 2)
-        {
-            
-            cookieCutterPath.strokeColor = blackColor;
-            startPoint.visible = false;
-            stickyMouse.visible = false;
-            cookieCutterPath.add(event.point);
-
-            paths.push(cookieCutterPath.clone());
-            cookieCutterPath.remove();
-            paper.restart();
-            setMode("EDIT");
-
-            return;
-
-        }
-
-        var closingPath = startPoint.hitTest(event.point, hitOptions);
-        if (closingPath) {
-            cookieCutterPath.closed = true;
-            cookieCutterPath.fillColor = whiteColor;
-            cookieCutterPath.strokeColor = "#FF0000";
-            cookieCutterPath.selected = false;
-            console.log((cookieCutterPath.firstSegment.point - event.point).length )
-
-            if(smoothing)
-            {
-                cookieCutterPath.smooth();
-            }
-
-            paths.push(cookieCutterPath.clone());
-            cookieCutterPath.remove();
-            startPoint.visible = false;
-            stickyMouse.visible = false;
 
 
-            paper.restart();
-            setMode("EDIT");
+//------------------------------------------------------------------------------
 
 
 
-        } 
-        else {
-            if (!startPoint.visible) {
-                startPoint.visible = true;
-                startPoint.position = event.point;
-            }
-
-            cookieCutterPath.add(event.point);
-        }
-    }
-    if (mode == "EDIT") {
+var circleTool = new Tool();
+circleTool.meta = pathMeta ; 
+circleTool.toolValues =  
+{	laserType:"cut",
+	strokeWidth:1
+}
 
 
+circleTool.updateObj = commonPathUpdate ; 
+circleTool.onMouseDown = function (event) {
 
-       if( event.modifiers.shift)
-       {
-            clickedItem = event.item; 
-            clickedPoint = event.point;
-       }
-       if(event.modifiers.option)
-       {
-        if(event.item)
-        { 
-            if(event.item.fillColor.toString() == "{ red: 1, green: 1, blue: 1, alpha: 0.5 }")
-            {
-                event.item.fillColor = blackColor
-                event.item.strokeColor = blackColor
+	circleTool.centerPoint = event.point;
+	//path.add(event.point);
+};
 
-            }
-            else
-            {
-                 event.item.fillColor = whiteColor
-                event.item.strokeColor = "#FF0000"
-            }
-        }
-       }
+circleTool.onMouseDrag = function(event) {
+	//path.add(event.point);
+	path = new Path.Circle({
+		center: circleTool.centerPoint,
+		radius: (circleTool.centerPoint - event.point).length,
+		fillColor:"black"
+	}).removeOnDrag().removeOnUp();
+	path.meta = circleTool.meta;
+	path.toolValues =circleTool.toolValues;
+	path.updateObj = circleTool.updateObj;
 
-       if( event.modifiers.control)
-       {
-            event.item.sendToBack();
-       }
 
-        segment = null;
-        for(var i = 0 ; i < paths.length ; i++)
-        {
-            var hitResult = paths[i].hitTest(event.point, hitOptions);
+	var val = $('#propGrid').jqPropertyGrid('get'); 
+	path.updateObj(val);
+}
+circleTool.onMouseUp = function (event)
+{
 
-            if (hitResult) {
-                if (event.modifiers.shift) {
-                    if (hitResult.type == 'segment') {
-                        hitResult.segment.remove();
-                    };
-                    return;
-                }
+	path = new Path.Circle({
+		center: circleTool.centerPoint,
+		radius: event.delta.length ,
+		fillColor:"black"
+	});
+	path.meta = circleTool.meta;
+	path.toolValues =circleTool.toolValues;
+	path.updateObj = circleTool.updateObj;
+
+
+	var val = $('#propGrid').jqPropertyGrid('get'); 
+	path.updateObj(val);
+	//selectTool.activate();
+	//window.toolHasChanged(selectTool.meta, selectTool.toolValues)
+}
+
+
+
+//------------------------------------------------------------------------------
+
+
+var starTool = new Tool();
+starTool.meta = pathMeta ;
+starTool.meta.points = {name: "Branches", group:'', type: 'options', options:  [{ text:"5", value: '5'},{ text:"6", value: '6'},{ text:"7", value: '7'},{ text:"9", value: '9'} ] };
+starTool.toolValues =  {
+	laserType:"cut",
+	strokeWidth:1,
+	points:5,
+}
+
+
+starTool.updateObj = commonPathUpdate ; 
+starTool.onMouseDown = function (event) {
+
+	starTool.centerPoint = event.point;
+	//path.add(event.point);
+};
+
+starTool.onMouseDrag = function(event) {
+	//path.add(event.point);
+	var val = $('#propGrid').jqPropertyGrid('get'); 
+	console.log(val)
+	path = new Path.Star({
+		center: starTool.centerPoint,
+		radius1: (starTool.centerPoint - event.point).length,
+		radius2: (starTool.centerPoint - event.point).length *0.5,
+		points : val.points,
+		fillColor:"black"
+	}).removeOnDrag().removeOnUp();
+	path.meta = starTool.meta;
+	path.toolValues =starTool.toolValues;
+	path.updateObj = starTool.updateObj;
+
+
+	var val = $('#propGrid').jqPropertyGrid('get'); 
+	path.updateObj(val);
+}
+starTool.onMouseUp = function (event)
+{
+	var val = $('#propGrid').jqPropertyGrid('get'); 
+	
+
+	path = new Path.Star({
+		center: starTool.centerPoint,
+		points : val.points,
+		radius1: event.delta.length ,
+			radius2:  event.delta.length*0.5,
+		fillColor:"black"
+	});
+	path.meta = starTool.meta;
+	path.toolValues =starTool.toolValues;
+	path.updateObj = starTool.updateObj;
+
+
+	var val = $('#propGrid').jqPropertyGrid('get'); 
+	path.updateObj(val);
+	//selectTool.activate();
+	//window.toolHasChanged(selectTool.meta, selectTool.toolValues)
+}
+
+
+
+//-----------------------------------------------------
+
+var snowFlakeTool = new Tool();
+snowFlakeTool.meta = pathMeta ;
+snowFlakeTool.meta.points = {name: "Branches", group:'', type: 'options', options:  [{ text:"5", value: '5'},{ text:"6", value: '6'},{ text:"7", value: '7'},{ text:"9", value: '9'} ] };
+snowFlakeTool.toolValues =  {
+	laserType:"cut",
+	strokeWidth:1,
+}
+
+
+snowFlakeTool.updateObj = commonPathUpdate ; 
+snowFlakeTool.onMouseDown = function (event) {
+
+	snowFlakeTool.centerPoint = event.point;
+	//path.add(event.point);
+};
+snowFlakeTool.flakePoints = [[558.8,196.9],[545.8,188.9],[535.8,205.4],[528.3,188.9],
+						[516.3,197.1],[527.3,219.9],[511.8,246.9],[495.8,217.9],
+						[507.8,196.4],[495.8,188.9],[488.3,205.4],[478.3,188.9],
+						[465.3,196.9],[474.3,212.4],[457.3,211.9],[457.3,225.9],
+						[481.3,226.4],[498.8,254.4],[466.8,254.4],[451.8,233.4],
+						[441.8,241.4],[451.3,254.4],[432.8,254.4],[432.8,269.9],
+						[450.3,269.9],[441.8,283.4],[451.3,291.9],[467.3,269.9],
+						[498.3,269.9],[482.3,297.9],[457.3,300.9],[456.8,312.9],
+						[473.8,312.9],[465.8,327.4],[478.3,335.9],[488.3,320.4],
+						[495.8,335.9],[507.3,329.4],[495.8,305.9],[511.3,277.9],
+						[527.8,305.4],[516.8,328.9],[528.3,335.9],[536.3,319.4],
+						[544.8,335.9],[558.8,327.4],[549.3,311.9],[568.8,312.4],
+						[568.8,300.4],[541.8,298.4],[525.8,269.9],[556.3,269.4],
+						[571.8,291.9],[582.8,284.4],[572.8,269.9],[592.3,269.9],
+						[592.3,254.9],[571.8,255.9],[582.3,239.4],[571.8,232.4],
+						[557.3,254.9],[524.8,255.4],[540.8,227.4],[568.8,225.4],
+						[566.3,212.4],[549.8,213.9]	]
+
+snowFlakeTool.onMouseDrag = function(event) {
+	//path.add(event.point);
+	var val = $('#propGrid').jqPropertyGrid('get'); 
+	path = new Path(snowFlakeTool.flakePoints
+				).removeOnDrag().removeOnUp();
+	//path.fitBounds(snowFlakeTool.centerPoint,  [event.delta,event.delta ]  )
+	path.meta = snowFlakeTool.meta;
+	path.closed = true;
+	path.position = snowFlakeTool.centerPoint;
+	path.scale( 2*(snowFlakeTool.centerPoint - event.point).length / path.bounds.width );
+	path.fillColor = "black"
+	path.toolValues =snowFlakeTool.toolValues;
+	path.updateObj = snowFlakeTool.updateObj;
+
+	console.log(path)
+
+	var val = $('#propGrid').jqPropertyGrid('get'); 
+	path.updateObj(val);
+}
+snowFlakeTool.onMouseUp = function (event)
+{
+	var val = $('#propGrid').jqPropertyGrid('get'); 
+	
+
+	path = new Path(snowFlakeTool.flakePoints)
+	//path.fitBounds(snowFlakeTool.centerPoint,  [event.delta,event.delta ]  )
+	path.meta = snowFlakeTool.meta;
+	path.closed = true;
+	path.position = snowFlakeTool.centerPoint;
+	path.scale( 2*(snowFlakeTool.centerPoint - event.point).length / path.bounds.width );
+	path.fillColor = "black"
+
+
+	path.meta = snowFlakeTool.meta;
+	path.toolValues =snowFlakeTool.toolValues;
+	path.updateObj = snowFlakeTool.updateObj;
+
+
+	var val = $('#propGrid').jqPropertyGrid('get'); 
+	path.updateObj(val);
+	//selectTool.activate();
+	//window.toolHasChanged(selectTool.meta, selectTool.toolValues)
+}
+
+
+
+
+
+
+//---------------------------------------------------
+
+
+var selectTool = new Tool();
+selectTool.meta = {
+};
+
+selectTool.toolValues =  {
+}
+
+selectTool.updateObj = function (val){
+	selectTool.selectedItem.updateObj(val)
+}
+selectTool.onKeyUp = function(event){
+	if(event.key == 'delete')
+	{
+		if(selectTool.selectedItem)
+		{
+			selectTool.selectedItem.remove();
+			selectTool.selectedItem = null;
+		}
+	}
+}
+selectTool.onKeyDown = function(event){
+	if(event.key == 'left')
+	{
+		if(selectTool.selectedItem)
+		{
+			selectTool.selectedItem.rotate(-1);
+		}
+	}
+	if(event.key == 'right')
+	{
+		if(selectTool.selectedItem)
+		{
+			selectTool.selectedItem.rotate(1);
+		}
+	}
+}
+selectTool.onMouseDown = function (event)
+{
+	project.activeLayer.selected = false;
+	selectTool.selectedItem = event.item;
+	if(event.item)
+	{
+		event.item.selected = true ;
+		if(event.modifiers.shift)
+		{
+			selectTool.selectedItem.sendToBack();
+		}
+		window.toolHasChanged(selectTool.selectedItem.meta, selectTool.selectedItem.toolValues);
+
+		segment  = null;
+		var hitResult = selectTool.selectedItem.hitTest(event.point, hitOptions);
+        if (hitResult) {
+            if (event.modifiers.shift) {
                 if (hitResult.type == 'segment') {
-                    segment = hitResult.segment;
-                } else if (hitResult.type == 'stroke') {
-                    var location = hitResult.location;
-                    segment = paths[i].insert(location.index + 1, event.point);
-                }
+                    hitResult.segment.remove();
+                };
+                return;
+            }
+            if (hitResult.type == 'segment') {
+                segment = hitResult.segment;
+            } else if (hitResult.type == 'stroke') {
+                var location = hitResult.location;
+                segment = selectTool.selectedItem.insert(location.index + 1, event.point);
             }
         }
-        
-    }
-    if( mode == "DELETE")
-    {
-        if(event.item)
-                event.item.remove();
+	}
+	else
+	{
+		window.toolHasChanged({}, {});
 
-    }
-
-
+	}
 }
-var smoothing= false ;
-function onMouseDrag(event) {
-
-
-
-
-    if (mode == "EDIT") {
-
-
-        if (segment) {
-            segment.point += event.delta;
-            if(event.item && smoothing) event.item.smooth();
-
-        } else {
-           
-            if (clickedItem && event.modifiers.shift ) {
-                var d = (clickedPoint.x - event.point.x ) / 10000 ;
-                clickedItem.scale( 1 + d);
-            }
-            else if (event.item)
-            {
-                 event.item.position += event.delta;
-            }
-
-
-        }
-        //fixIntersections(cookieCutterPath);
-    }
+selectTool.onMouseDrag = function(event) {
+	
+	if(selectTool.selectedItem)
+	{
+		if(event.modifiers.control)
+		{
+			selectTool.selectedItem.scale( 1 + (event.delta.x/100));
+		}
+		else
+		{
+			if(segment)
+			{
+				segment.point += event.delta;
+			}
+			else
+			{
+				selectTool.selectedItem.position += event.delta;
+			}				
+		}	
+	}
 }
-
-
-/* END Mouse interaction */
-
-function prePostPoints(path) {
-    var clonedPath = path.clone();
-
-    var scalex = 800 / clonedPath.bounds.width;
-    var scaley = 800 / clonedPath.bounds.height;
-    var scale = scalex;
-    if (scalex > scaley) {
-        scale = scaley;
-    }
-    clonedPath.scale(scale);
-    clonedPath.translate(new Point(-clonedPath.position.x + 100, -clonedPath.position.y));
-    var simplePoints = offsetPoints(clonedPath, 0, 0); //cookieCutterPath.bounds.center.x,cookieCutterPath.bounds.center.y);
-
-    clonedPath.flatten(25);
-    var points = offsetPoints(clonedPath, 0, 0); //cookieCutterPath.bounds.center.x,cookieCutterPath.bounds.center.y);
-
-    clonedPath.remove();
-    postPoints(points, simplePoints, selfIntersectionCount);
-}
-
-function offsetPoints(path, offsetX, offsetY) {
-    var points = [];
-    for (var i = 0; i < path.segments.length; i++) {
-        points.push([path.segments[i].point.x + offsetY, path.segments[i].point.y + offsetY]);
-    }
-
-    return points;
-}
-
-
-
-function fixIntersections(path) {
-   return;
-    selfIntersectionCount = 0;
-    for (var i = 0; i < path.curves.length; i++) {
-        var p = new Path(path.curves[i].segment1, path.curves[i].segment2);
-        var inter = p.getIntersections(path);
-        p.remove();
-        if (inter.length >= 3) {
-            for (var j = 0; j < inter.length; j++) {
-                if (!((inter[j].point.x == p.curves[0].segment1.point.x && inter[j].point.y == p.curves[0].segment1.point.y) || inter[j].point.x == p.curves[0].segment2.point.x && inter[j].point.y == p.curves[0].segment2.point.y)) {
-                    var p = new Path.Circle({
-                        center: inter[j].point,
-                        radius: 5,
-                        fillColor: '#fa0000',
-                        selected:false
-                    }).removeOnDrag().removeOnDown();
-                    redCircleGroup.selected = false;
-                    redCircleGroup.addChild(p);
-                    redCircleGroup.bringToFront();
-                    selfIntersectionCount++;
-
-                }
-            }
-        }
-    }
-}
-
-
-/* background management */
-
-function handleImage(image) {
-    count = 0;
-    if (group)
-        group.remove();
-    if( raster)
-    {
-        raster.remove();
-    }
-    raster = new Raster(image);
-    raster.fitBounds(view.bounds, false);
-    raster.scale(0.7);
-    raster.position = new Point(view.bounds.width /2,raster.bounds.height/2 +20);
-    raster.sendToBack();
-}
+selectTool.onMouseUp = function(event){ }
+selectTool.onMouseMove = function(event){ }
 
 
 
 
 
-function onDocumentDrag(event) {
-    event.preventDefault();
-}
 
-function onDocumentDrop(event) {
-    event.preventDefault();
+//----------------------------------------------
 
-    var file = event.dataTransfer.files[0];
-    var reader = new FileReader();
 
-    reader.onload = function(event) {
-        var image = document.createElement('img');
-        image.onload = function() {
-            handleImage(image);
-            view.update();
-        };
-        image.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-}
+var polyLineTool = new Tool();
 
-DomEvent.add(document, {
-    drop: onDocumentDrop,
-    dragover: onDocumentDrag,
-    dragleave: onDocumentDrag
+polyLineTool.c = new Path.Circle({
+				center: [-10,-10],
+				radius: 10,
+				fillColor:"red",
+				visible : false
+			});
+
+
+polyLineTool.line = new Path.Line( {
+	strokeWidth:1,
+	strokeColor:'black',
+	visible : false,
+	from: [0,0],
+	to : [1,1]
 });
 
+polyLineTool.meta = pathMeta ; 
+polyLineTool.toolValues =  {
+	laserType:"cut",
+	strokeWidth:1
 
+}
 
+polyLineTool.updateObj = commonPathUpdate;
+polyLineTool.onKeyUp = function(event){ }
 
-/* Keyboard */
+polyLineTool.stopPath = function(){
+				console.log(polyLineTool.myPath);
+				polyLineTool.myPath.updateObj(polyLineTool.myPath.toolValues) 
+				polyLineTool.myPath.closed = true;
+				polyLineTool.c.visible = polyLineTool.line.visible = false;
 
-function onKeyUp(event) {
-    if (mode == "SAVE")
-        return;
-    var refresh = false;
-    var rotate = true;
-    var newPoints = [];
+				// Change tool!
+				selectTool.activate();
+				window.toolHasChanged(selectTool.meta, selectTool.toolValues)
 
-    if (event.key == 'k') {
-        refresh = true;
-        newPoints = kikkSegments;
-    }
+}
 
-    if(event.key =='p')
-    {
-        cookieCutterPath.selected = ! cookieCutterPath.selected ;
-    }
+polyLineTool.myPath = null;
+polyLineTool.onMouseDown = function (event)
+{		
+		polyLineTool.minDistance = 20;
 
-    if (event.key == "g") {
-        if (grid) {
-            grid.remove();
-            grid = null;
-        } else {
+		if( polyLineTool.c.visible)
+		{
+			console.log("hey");
+			if( (event.point - polyLineTool.c.position).length < 10)
+			{
+					polyLineTool.stopPath();
+			}
+			else
+			{
+				polyLineTool.myPath.add(event.point);
+				polyLineTool.line.strokeColor = polyLineTool.myPath.strokeColor;
 
-            grid = new Group();
-            for (var r =
-                0; r < view.bounds.height; r += 20) {
-                var p = new Path.Line(new Point(0, r), new Point(view.bounds.width, r));
-                p.strokeColor = {
-                    color: "black",
-                    alpha: "0.1"
-                };
-           }
+			}
+		}
+		else
+		{	
+			polyLineTool.c.visible = polyLineTool.line.visible =  true;
 
-            for (var r = 0; r < view.bounds.width; r += 20) {
-                var p = new Path.Line(new Point(r, 0), new Point(r, view.bounds.height));
-                p.strokeColor = {
-                    color: "black",
-                    alpha: "0.1"
-                };
-                grid.addChild(p);
-            }
-        }
-    }
+			polyLineTool.c.position = event.point;
 
+			polyLineTool.line.firstSegment.point = event.point;
+			polyLineTool.line.lastSegment.point = event.point;
 
-    if (event.key == '/') {
-        var cutters = $.jStorage.get("cookieCutters");
-        if (cutters.length > 0) {
-            if (currentIndex >= cutters.length) {
-                currentIndex = 0;
-            }
-            newPoints = cutters[currentIndex].points;
-            textItem2.content = cutters[currentIndex].name;
-            currentIndex++;
-        }
-        refresh =true;
-        rotate = false;
-    }
-    if (event.key == 's') {
-        var c = new Path.Star(350, 320, 20, 230, 250);
-        newPoints = c.segments;
-        c.remove();
-        refresh = true;
-    }
+			var val = $('#propGrid').jqPropertyGrid('get'); 
+			polyLineTool.myPath = new Path();
+			polyLineTool.myPath.add(event.point);			
+			polyLineTool.myPath.meta = polyLineTool.meta;
+			polyLineTool.myPath.toolValues =polyLineTool.toolValues;
+			polyLineTool.myPath.updateObj  = polyLineTool.updateObj;
+			polyLineTool.myPath.updateObj(polyLineTool.myPath.toolValues) 
+			polyLineTool.myPath.fillColor = null;
+			polyLineTool.c.bringToFront();
+		}
 
-    if (event.key == 'e') {
-        var c = new Path.Star(350, 320, 5, 150, 250);
-        newPoints = c.segments;
-        c.remove();
-        refresh = true;
-    }
-    if (event.key == 'c') {
-        //alert("c")
-        var c = new Path.Circle({
-            center: new Point(350, 320),
-            radius: 200,
-        });
-        c.flatten(55);
-        newPoints = c.segments;
-        c.remove();
-        refresh = true;
-    }
-    if (event.key == 'x') {
-        var c = new Path({
-            segments: spaceInvader
-        });
-        c.scale(40);
-        c.translate(300, 200);
-        c.remove();
-        newPoints = c.segments;
-        refresh = true;
+}
+polyLineTool.smoothingIndex = -1;
+polyLineTool.onMouseDrag = function(event) {
+	
+	if( polyLineTool.myPath)
+	{
+		if(polyLineTool.smoothingIndex == -1)
+		 {
+		 	polyLineTool.smoothingIndex = polyLineTool.myPath.segments.length;
+		 }
+		
+		if( (event.point - polyLineTool.c.position).length < 21)
+		{
+			polyLineTool.stopPath();
+		}
+		else
+		{
+			polyLineTool.myPath.add(event.point);
+		}
 
-    }
-    if (event.key == 'r') {
-        //alert("c")
-        var c = new Path.Rectangle(new Point(150, 120), new Size(400, 300));
-        c.flatten(50);
-        newPoints = c.segments;
-        c.remove();
-        refresh = true;
-    }
-    if( event.key == 'l')
-    {   smoothing = !smoothing;
+	}
+	
+}
+polyLineTool.onMouseUp = function(event){ 
+	polyLineTool.minDistance = 1;
+	if(polyLineTool.smoothingIndex != -1)
+	{
+		console.log( { from: polyLineTool.smoothingIndex , 
+									 to: polyLineTool.myPath.segments.length-1 });
+		polyLineTool.myPath.smooth({from: polyLineTool.smoothingIndex , 
+									 to: polyLineTool.myPath.segments.length-1 });
+		polyLineTool.smoothingIndex = -1;
+	}
+}
+polyLineTool.onMouseMove = function(event){
+	if(polyLineTool.c.visible)
+	{
 
-        for(var i= 0; i < paths.length; i++)
-        {
-                if(smoothing)
-                {
-                    paths[i].smooth(); 
-                }
-                else
-                {
-                    var newPoints = [];
-                    for(var j= 0; j < paths[i].segments.length; j++)
-                        newPoints.push(paths[i].segments[j].point)
-    
-                    var p = new Path({
-                    segments: newPoints,
-                    fillColor: paths[i].fillColor,
-                    strokeColor: "#FF0000",
-                    strokeWidth: 3,
-                    selected: false,
-                    strokeJoin: "round",
-                    closed: paths[i].closed});
-
-                    paths[i].remove();
-                    paths[i] =p;
-
-                 }
-        }
-
-    }
-    if (event.key == '+' || event.key == '-') {
-        var w = cookieCutterPath.bounds.width;
-        var h = cookieCutterPath.bounds.height;
-        if (event.key == '-') {
-            cookieCutterPath.scale(0.9);
-            if (raster) raster.scale(0.9);
-        } else {
-            cookieCutterPath.scale(1.1);
-            if (raster) raster.scale(1.1);
-        }
-
-        cookieCutterPath.translate((cookieCutterPath.bounds.width - w) / 2, (cookieCutterPath.bounds.height - h) / 2);
-
-        prePostPoints(cookieCutterPath);
-
-    }
-
-
-    if (event.key == 'f') {
-        cookieCutterPath.flatten(flattenValue);
-    }
-    if (event.key == 'd') {
-        cookieCutterPath.simplify(10);
-        cookieCutterPath.flatten(flattenValue);
-    }
-
-    if (event.key == '<') {
-
-        flattenValue -= 5;
-        if (flattenValue < 5) {
-            flattenValue = 5;
-        }
-        cookieCutterPath.flatten(flattenValue);
-    }
-
-    if (event.key == '>') {
-
-        flattenValue += 5;
-        if (flattenValue > 150) {
-            flattenValue = 150;
-        }
-        cookieCutterPath.flatten(flattenValue);
-    }
-
-    if (refresh) {
-
-        if (cookieCutterPath) {
-             cookieCutterPath.remove();
-      
-        }
-         cookieCutterPath = new Path({
-            segments: newPoints,
-            fillColor: whiteColor,
-            strokeColor: "#009dec",
-            strokeWidth: 3,
-            selected: false,
-            strokeJoin: "round",
-            closed: true,
-        });
-        
-        if (rotate) cookieCutterPath.rotate(180);
-            cookieCutterPath.translate((-cookieCutterPath.bounds.x + 50), (-cookieCutterPath.bounds.y + 50));
-
-        paths.push(cookieCutterPath.clone());
-        cookieCutterPath.remove();
-      
-
-        setMode("EDIT");
-
-    }
+		polyLineTool.line.firstSegment.point = polyLineTool.myPath.lastSegment.point ;
+		polyLineTool.line.lastSegment.point = event.point;
+	}
 }
 
 
-/* data */
-var kikkSegments = [
-    [222, 160],
-    [302, 76],
-    [386, 156],
-    [470, 76],
-    [558, 156],
-    [558, 324],
-    [390, 488],
-    [390, 324],
-    [302, 404],
-    [222, 332],
-    [302, 244],
-    [222, 160]
-];
-var spaceInvader = [
-    [0, 13],
-    [1, 13],
-    [1, 15],
-    [2, 15],
-    [2, 13],
-    [3, 13],
-    [3, 14],
-    [8, 14],
-    [8, 13],
-    [9, 13],
-    [9, 15],
-    [10, 15],
-    [10, 13],
-    [11, 13],
-    [11, 16],
-    [10, 16],
-    [10, 17],
-    [9, 17],
-    [9, 18],
-    [8, 18],
-    [8, 19],
-    [7, 19],
-    [7, 18],
-    [4, 18],
-    [4, 19],
-    [3, 19],
-    [3, 18],
-    [2, 18],
-    [2, 17],
-    [1, 17],
-    [1, 16],
-    [0, 16],
-    [0, 13]
-];
+
+//------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+// Activate first tool
+
+
+snowFlakeTool.activate();
+window.toolHasChanged(starTool.meta, snowFlakeTool.toolValues)
+
+
+
+
+
+
+
+
+
+paper.settings.handleSize = 15;
+/// Change tool
+paper.changeTool = function(t){
+
+	switch(t)
+	{
+		case "pen":
+		penTool.activate();
+		break;
+
+		case "circle":
+		circleTool.activate();
+		break;
+
+		case "select":
+			selectTool.activate();
+		break;
+
+
+	}
+}

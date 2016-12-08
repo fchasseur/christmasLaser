@@ -97,7 +97,6 @@ input, select {
 
 body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-  background:#AAAAAA;
   overflow: hidden;
 }
 
@@ -231,7 +230,7 @@ color: #fff;
 /* states and images */
 .ui-icon {
   display: block;
-  text-indent: -99999px;
+  text-indent: 0;
   overflow: hidden;
   background-repeat: no-repeat;
 }

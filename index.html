@@ -2,10 +2,9 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>Christmasr</title>
+        <title>Christmas</title>
         <script type="text/javascript" src="./scripts/jquery-1.9.1.js"></script>
-
-        <script type="text/javascript" src="./scripts/jquery-ui-1.10.3.min.js"></script>
+     	 <script type="text/javascript" src="./scripts/jquery-ui-1.10.3.min.js"></script>
         <script type="text/javascript" src="./scripts/paperjs/dist/paper-full.js"></script>
    		<script type="text/javascript" src="./scripts/webcam.min.js"></script>
         <script type="text/javascript" src="./scripts/js.js"></script>
@@ -13,13 +12,16 @@
         <script type="text/javascript" src="./scripts/jStorage.js"></script>
         <link rel="stylesheet" type="text/css" href="./css/style.css">
         <link rel="stylesheet" type="text/css" href="./css/styleMain.css">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> <!--320-->
+       
+       <script src='./scripts/jqPropertyGrid.js'></script>
+
+ <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> <!--320-->
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <script type="text/javascript">
         
         </script>
     </head>
-    <body oncontextmenu="return false;" >
+    <body  oncontextMenu="return false">
         <section role="main">
 	<div id="container">
 		<nav id="toolbar">
@@ -33,6 +35,11 @@
 			</ul>
 		</nav>
 		<canvas id="cookieCutter2d"  class="bigView"></canvas>
+		<div  class="smallPreview" >
+			<div id='toolProp'/>
+			<div id='propGrid'/>
+		</div>
+
 		<div id="dialog" >
 			<div>
 				Donne donc un nom à dessin :<br/>
@@ -58,7 +65,29 @@
 	var currentPoints = [], simplePoints = [];
 	var intersectCount = 0;
 	var mode = "";
+	
+
+function propertyChangedCallback(grid, name, value) {
+  	console.log(name + ' ' + value);
+  	var theNewObj = $('#propGrid').jqPropertyGrid('get');
+  	paper.tool.updateObj(theNewObj);
+}
+
+
+window.toolHasChanged = function(obj, meta)
+ {
+	// Create the grid
+	$('#propGrid').jqPropertyGrid( meta, obj,propertyChangedCallback )
+
+ }
+
 	$(document).ready(function() {
+
+
+// In order to get back the modified values:
+
+
+
 	    $( "#dialog" ).dialog({height:160, width:350, modal:true,title:"Enregistrement",  dialogClass: "no-close", autoOpen:false} );
 	    
 
@@ -75,7 +104,7 @@
 
  		$("#addBtn").click(function(event) {
 	    		
-	    		setMode("ADD");
+	    		paper.changeTool("pen");
 	    });
 
 
@@ -102,7 +131,7 @@
 
 
 	    $("#penBtn").click(function() {
-	        setMode("RESTART");
+	       paper.changeTool("pen");
 	    });
 
 
@@ -146,7 +175,7 @@
 
 	     });
 	    $("#editBtn").click(function() {
-	        setMode("EDIT");
+	        paper.changeTool("pen")
 	    });
 	    $("#previewBtn").click(function() {
 	    	if( intersectCount > 0)
@@ -156,11 +185,10 @@
 	    	}	     	
 	    });
 	     $("#deleteBtn").click(function() {
-	        setMode("DELETE");
+	       paper.changeTool("select")
 	    });
 	
 	});
-
 	function postPoints(points,simplePoints,intersectionCount) {
 	    currentPoints = points;
 	    currentSimplePoints = simplePoints;

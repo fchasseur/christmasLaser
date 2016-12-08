@@ -23,7 +23,7 @@ body {
 #toolbar
 {
 	position: absolute;
-	top: 5px;	
+	bottom: 25px;	
 	right: 50px;
 }
 
@@ -34,10 +34,11 @@ body {
 	top: 45px;	
 	right: 10px;
 	background: transparent;
-	height: 200px;
-	max-height: 200px;
+	height: auto;
+	max-height: auto;
 	width: 300px;
 	z-index: 100;
+	background: white;
 }
 .button
 {
@@ -117,4 +118,36 @@ body {
 #cookieName
 {
 	width: 310px;
+}
+
+/**
+ * jqPropertyGrid
+ * https://github.com/ValYouW/jqPropertyGrid
+ * Author: YuvalW (ValYouW)
+ * License: MIT
+ */
+.pgTable {
+    border: solid 1px #95B8E7;
+    border-spacing: 0;
+}
+
+.pgGroupRow {
+    background-color: #E0ECFF;
+    font-weight: bold;
+}
+
+.pgGroupCell {
+    padding: 5px;
+}
+
+.pgRow{
+}
+
+.pgCell {
+    border: dotted 1px #ccc;
+    padding: 5px;
+}
+
+.pgTooltip {
+    margin-left: 5px;
 }
