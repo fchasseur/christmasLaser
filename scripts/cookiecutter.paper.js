@@ -9,8 +9,15 @@ var hitOptions = {
 };
 
 var pathMeta = {
-    laserType: {name: 'Type', group: '', type: 'options', options: [ {text:'Applat', value: 'applat'} , {text:'Decoupe', value: 'cut'},{text:'Gravure', value: 'engraving'}] },
-    strokeWidth: {name: "Epaisseur", group:'', type: 'options', options:  [{ text:"1", value: '5'},{ text:"2", value: '7'},{ text:"3", value: '10'},{ text:"4", value: '15'}] }
+    laserType: {name: 'Type', group: 'Outils', type: 'options', options: [ {text:'Applat', value: 'applat'} , {text:'Decoupe', value: 'cut'},{text:'Gravure', value: 'engraving'}] },
+    strokeWidth: {name: "Epaisseur", group:'Outils', type: 'options', 
+    options:  [
+		    	{ text:"1", value: '1'},
+		    	{ text:"3", value: '3'},
+		    	{ text:"7", value: '7'},
+		    	{ text:"12", value: '12'}
+    		]
+    	 }
 };
 
 commonPathUpdate = function (val)
@@ -23,16 +30,23 @@ commonPathUpdate = function (val)
 		case "cut":
 			p.strokeColor = 'red';
 			p.fillColor = 'white';
-			p.strokeWidth = 5;
+			p.fillColor.alpha = 0.1;
+			p.strokeWidth = 1;
 		break;
 
 		case "applat":
 			p.strokeColor = 'black';
 			p.fillColor = "black";
+			p.fillColor.alpha = 0.9;
+
 		break
 		case "engraving":
 			p.strokeColor = 'black';
 			p.fillColor = "white";
+			p.fillColor.alpha = 0.1;
+			p.strokeWidth = 3;
+
+
 		break;
 
 	} 
@@ -45,9 +59,10 @@ var path;
 //------------------------------------------------------------------------------
 var penTool = new Tool();
 
-penTool.meta = pathMeta ; 
+penTool.meta = JSON.parse(JSON.stringify(pathMeta)) ;
+penTool.meta.laserType.group = penTool.meta.strokeWidth.group = "Crayon" 
 penTool.toolValues =  {
-	laserType:"applat",
+	laserType:"engraving",
 	strokeWidth:1
 }
 
@@ -81,7 +96,8 @@ penTool.onMouseUp = function (event)
 
 
 var circleTool = new Tool();
-circleTool.meta = pathMeta ; 
+circleTool.meta = JSON.parse(JSON.stringify(pathMeta)) ; ; 
+circleTool.meta.laserType.group = circleTool.meta.strokeWidth.group = "Cercle" 
 circleTool.toolValues =  
 {	laserType:"cut",
 	strokeWidth:1
@@ -133,10 +149,11 @@ circleTool.onMouseUp = function (event)
 
 //------------------------------------------------------------------------------
 
-
 var starTool = new Tool();
-starTool.meta = pathMeta ;
-starTool.meta.points = {name: "Branches", group:'', type: 'options', options:  [{ text:"5", value: '5'},{ text:"6", value: '6'},{ text:"7", value: '7'},{ text:"9", value: '9'} ] };
+starTool.meta = JSON.parse(JSON.stringify(pathMeta)) ; ;
+starTool.meta.laserType.group = starTool.meta.strokeWidth.group = "Etoile" 
+
+starTool.meta.points = {name: "Branches", group:'Etoile', type: 'options', options:  [{ text:"5", value: '5'},{ text:"6", value: '6'},{ text:"7", value: '7'},{ text:"9", value: '9'} ] };
 starTool.toolValues =  {
 	laserType:"cut",
 	strokeWidth:1,
@@ -154,7 +171,6 @@ starTool.onMouseDown = function (event) {
 starTool.onMouseDrag = function(event) {
 	//path.add(event.point);
 	var val = $('#propGrid').jqPropertyGrid('get'); 
-	console.log(val)
 	path = new Path.Star({
 		center: starTool.centerPoint,
 		radius1: (starTool.centerPoint - event.point).length,
@@ -173,8 +189,6 @@ starTool.onMouseDrag = function(event) {
 starTool.onMouseUp = function (event)
 {
 	var val = $('#propGrid').jqPropertyGrid('get'); 
-	
-
 	path = new Path.Star({
 		center: starTool.centerPoint,
 		points : val.points,
@@ -198,7 +212,10 @@ starTool.onMouseUp = function (event)
 //-----------------------------------------------------
 
 var snowFlakeTool = new Tool();
-snowFlakeTool.meta = pathMeta ;
+snowFlakeTool.meta = JSON.parse(JSON.stringify(pathMeta)) ; ;
+snowFlakeTool.meta.laserType.group = snowFlakeTool.meta.strokeWidth.group = "Flocon" 
+
+
 snowFlakeTool.meta.points = {name: "Branches", group:'', type: 'options', options:  [{ text:"5", value: '5'},{ text:"6", value: '6'},{ text:"7", value: '7'},{ text:"9", value: '9'} ] };
 snowFlakeTool.toolValues =  {
 	laserType:"cut",
@@ -244,7 +261,6 @@ snowFlakeTool.onMouseDrag = function(event) {
 	path.toolValues =snowFlakeTool.toolValues;
 	path.updateObj = snowFlakeTool.updateObj;
 
-	console.log(path)
 
 	var val = $('#propGrid').jqPropertyGrid('get'); 
 	path.updateObj(val);
@@ -325,28 +341,42 @@ selectTool.onMouseDown = function (event)
 	if(event.item)
 	{
 		event.item.selected = true ;
-		if(event.modifiers.shift)
+		if(event.modifiers.option)
 		{
-			selectTool.selectedItem.sendToBack();
-		}
-		window.toolHasChanged(selectTool.selectedItem.meta, selectTool.selectedItem.toolValues);
 
-		segment  = null;
-		var hitResult = selectTool.selectedItem.hitTest(event.point, hitOptions);
-        if (hitResult) {
-            if (event.modifiers.shift) {
-                if (hitResult.type == 'segment') {
-                    hitResult.segment.remove();
-                };
-                return;
-            }
-            if (hitResult.type == 'segment') {
-                segment = hitResult.segment;
-            } else if (hitResult.type == 'stroke') {
-                var location = hitResult.location;
-                segment = selectTool.selectedItem.insert(location.index + 1, event.point);
-            }
-        }
+			selectTool.selectedItem.sendToBack();
+			if( raster )
+				raster.sendToBack();
+		}
+		else
+		{
+			if(selectTool.selectedItem.meta)
+			{
+				window.toolHasChanged(selectTool.selectedItem.meta, selectTool.selectedItem.toolValues);
+			}
+			else
+			{
+				window.toolHasChanged({},{})
+			}
+
+			segment  = null;
+			var hitResult = selectTool.selectedItem.hitTest(event.point, hitOptions);
+	        if (hitResult) {
+	            if (event.modifiers.shift) {
+	                if (hitResult.type == 'segment') {
+	                    hitResult.segment.remove();
+	                };
+	                return;
+	            }
+	            if (hitResult.type == 'segment') {
+	                segment = hitResult.segment;
+	            } else if (hitResult.type == 'stroke') {
+	                var location = hitResult.location;
+	                segment = selectTool.selectedItem.insert(location.index + 1, event.point);
+	            }
+	        }
+		}
+
 	}
 	else
 	{
@@ -404,18 +434,19 @@ polyLineTool.line = new Path.Line( {
 	to : [1,1]
 });
 
-polyLineTool.meta = pathMeta ; 
+polyLineTool.meta = JSON.parse(JSON.stringify(pathMeta)) ; ; 
 polyLineTool.toolValues =  {
 	laserType:"cut",
 	strokeWidth:1
 
 }
 
+polyLineTool.meta.laserType.group = polyLineTool.meta.strokeWidth.group = "Polyline" 
+
 polyLineTool.updateObj = commonPathUpdate;
 polyLineTool.onKeyUp = function(event){ }
 
 polyLineTool.stopPath = function(){
-				console.log(polyLineTool.myPath);
 				polyLineTool.myPath.updateObj(polyLineTool.myPath.toolValues) 
 				polyLineTool.myPath.closed = true;
 				polyLineTool.c.visible = polyLineTool.line.visible = false;
@@ -433,7 +464,6 @@ polyLineTool.onMouseDown = function (event)
 
 		if( polyLineTool.c.visible)
 		{
-			console.log("hey");
 			if( (event.point - polyLineTool.c.position).length < 10)
 			{
 					polyLineTool.stopPath();
@@ -442,7 +472,6 @@ polyLineTool.onMouseDown = function (event)
 			{
 				polyLineTool.myPath.add(event.point);
 				polyLineTool.line.strokeColor = polyLineTool.myPath.strokeColor;
-
 			}
 		}
 		else
@@ -514,47 +543,87 @@ polyLineTool.onMouseMove = function(event){
 
 
 
-
-
-
-
-
-
-
-
-
 // Activate first tool
 
 
-snowFlakeTool.activate();
-window.toolHasChanged(starTool.meta, snowFlakeTool.toolValues)
+selectTool.activate();
+window.toolHasChanged(selectTool.meta, selectTool.toolValues)
 
-
-
-
-
-
-
-
-
-paper.settings.handleSize = 15;
+paper.settings.handleSize = 10;
+paper.settings.hitTolerance = 20;
 /// Change tool
 paper.changeTool = function(t){
-
 	switch(t)
 	{
 		case "pen":
 		penTool.activate();
+		window.toolHasChanged(penTool.meta, penTool.toolValues)
+		break;
+		
+		case "polyline":
+		polyLineTool.activate();
+		window.toolHasChanged(polyLineTool.meta, polyLineTool.toolValues)
+
 		break;
 
 		case "circle":
 		circleTool.activate();
+		window.toolHasChanged(circleTool.meta, circleTool.toolValues)
+		break;
+		
+		case "flake":
+			snowFlakeTool.activate();
+			window.toolHasChanged(snowFlakeTool.meta, snowFlakeTool.toolValues)
+		break;
+
+		case "star":
+			starTool.activate();
+			window.toolHasChanged(starTool.meta, starTool.toolValues)
 		break;
 
 		case "select":
 			selectTool.activate();
+			window.toolHasChanged(selectTool.meta, selectTool.toolValues)
 		break;
 
 
 	}
+}
+paper.loadImage = function(img){
+    handleImage(img);
+};
+
+
+var raster;
+
+function handleImage(image) {
+    count = 0;
+   /* if (group)
+        group.remove();*/
+    if( raster)
+    {
+        raster.remove();
+    }
+    raster = new Raster(image);
+    raster.fitBounds(view.bounds, false);
+    raster.scale(0.7);
+    raster.position = new Point(view.bounds.width /2,raster.bounds.height/2 +20);
+    raster.sendToBack();
+}
+
+
+paper.downloadAsSVG = function(fileName) {
+
+    if (!fileName) {
+        fileName = "paperjs_example.svg"
+    }
+
+    var url = "data:image/svg+xml;utf8," + encodeURIComponent(paper.project.exportSVG({
+        asString: true
+    }));
+
+    var link = document.createElement("a");
+    link.download = fileName;
+    link.href = url;
+    link.click();
 }

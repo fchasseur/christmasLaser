@@ -23,8 +23,9 @@ body {
 #toolbar
 {
 	position: absolute;
-	bottom: 25px;	
+	bottom: 40px;	
 	right: 50px;
+	height: 25px;
 }
 
  .smallPreview
@@ -48,13 +49,12 @@ body {
     background-repeat: no-repeat;
 
 }
-.button > div
+#toolbar > a
 {
-	    width: 95px;
-	    height: 40px;
-		padding-top: 25px;
 		display: block;
 	    vertical-align: bottom;
+	    float: left;
+	    margin: 10px;
 
 }
 .button span

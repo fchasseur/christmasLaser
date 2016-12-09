@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html>
     <head>
         <meta charset="utf-8" />
@@ -10,8 +10,11 @@
         <script type="text/javascript" src="./scripts/js.js"></script>
         <script type="text/javascript" src="./scripts/three.js"></script>
         <script type="text/javascript" src="./scripts/jStorage.js"></script>
+        <script type="text/javascript" src="./scripts/jquery.toolbar.min.js"></script>
         <link rel="stylesheet" type="text/css" href="./css/style.css">
         <link rel="stylesheet" type="text/css" href="./css/styleMain.css">
+        <link rel="stylesheet" type="text/css" href="./css/jquery.toolbar.css">
+
        
        <script src='./scripts/jqPropertyGrid.js'></script>
 
@@ -24,16 +27,27 @@
     <body  oncontextMenu="return false">
         <section role="main">
 	<div id="container">
-		<nav id="toolbar">
-			<ul>
-				<li><a href="#" id="loadBtn" class="button"><div><span>Camera</span></div></a></li>
-				<li><a href="#" id="penBtn" class="button"><div><span>Recommencer</span></div></a></li>
-				<li><a href="#" id="editBtn" class="toggleButton button"><div><span>Modifier</span></div></a></li>
-				<li><a href="#" id="deleteBtn" class="toggleButton button"><div><span>Supprimer</span></div></a></li> 
-				<li><a href="#" id="addBtn" class="toggleButton button"><div><span>Ajouter</span></div></a></li> 
-                <li><a href="#" id="saveBtn" class = "button"><div><span>Sauvegarder</span></div></a></li>
-			</ul>
-		</nav>
+		<div id="toolbar" >
+			<a class="btn-toolbar select"> Select </a>
+			<a  class="btn-toolbar photo"> Photo </a>
+			<a id="freeform" class="btn-toolbar "> Libre </a>
+			<div id="toolbar-freeform" class="hidden">
+			   <a href="#" class="pen" >Crayon</a>
+			   <a href="#" class="polyline" >Polylines</i></a>
+			</div>
+		
+			
+			<a id="form" class="btn-toolbar" >Forme </a>
+			<div id="toolbar-formes" class="hidden">
+			   <a href="#" class="star" id="star">Star</a>
+			   <a href="#" class="circle" id="circle" >Circle</i></a>
+			   <a href="#" class="flake" id="flake" >Flake</i></a>
+			</div>
+		
+			<a class="btn-toolbar save"> Save </a>
+
+
+		</div>
 		<canvas id="cookieCutter2d"  class="bigView"></canvas>
 		<div  class="smallPreview" >
 			<div id='toolProp'/>
@@ -59,8 +73,17 @@
 	<script type="text/javascript">
 
 
-	   
-
+	   $('#freeform').toolbar({
+		content: '#toolbar-freeform',
+		event: 'click',
+		hideOnClick: true
+	});
+ 
+ 	 $('#form').toolbar({
+		content: '#toolbar-formes',
+		event: 'click',
+		hideOnClick: true
+	});
 
 	var currentPoints = [], simplePoints = [];
 	var intersectCount = 0;
@@ -86,7 +109,7 @@ window.toolHasChanged = function(obj, meta)
 
 // In order to get back the modified values:
 
-
+		 
 
 	    $( "#dialog" ).dialog({height:160, width:350, modal:true,title:"Enregistrement",  dialogClass: "no-close", autoOpen:false} );
 	    
@@ -102,11 +125,32 @@ window.toolHasChanged = function(obj, meta)
 
 
 
- 		$("#addBtn").click(function(event) {
+ 		$(".star").click(function(event) {
+	    		
+	    		paper.changeTool("star");
+	    });
+
+ 		$(".circle").click(function(event) {
+	    		
+	    		paper.changeTool("circle");
+	    });
+	    $(".flake").click(function(event) {
+	    		
+	    		paper.changeTool("flake");
+	    });
+ 	   $(".pen").click(function(event) {
 	    		
 	    		paper.changeTool("pen");
 	    });
+ 	   $(".select").click(function(event) {
+	    		
+	    		paper.changeTool("select");
+	    });
 
+ 	   $(".polyline").click(function(event) {
+	    		
+	    		paper.changeTool("polyline");
+	    });
 
 
 	    $("#dialogLoad").dialog({ height: 600, width: 'auto', modal: true, title: "Camera", dialogClass: "no-close", autoOpen: false });
@@ -128,14 +172,7 @@ window.toolHasChanged = function(obj, meta)
 	    });
 
 
-
-
-	    $("#penBtn").click(function() {
-	       paper.changeTool("pen");
-	    });
-
-
-	    $("#loadBtn").click(function () {
+	    $(".photo").click(function () {
 	        
 	         Webcam.set({
                 // live preview size
@@ -164,15 +201,9 @@ window.toolHasChanged = function(obj, meta)
 	    });
 
 
-	    $("#saveBtn").click(function() {
-	    	if( intersectCount > 0)
-	    	{
-	    		alert("Modifie la forme. Elle contient des intersections.");
-	    		return;
-	    	}
-	    	setMode("SAVE");
+	    $(".save").click(function() {
+	    	paper.changeTool("select")
 			$("#dialog").dialog("open");
-
 	     });
 	    $("#editBtn").click(function() {
 	        paper.changeTool("pen")
@@ -232,7 +263,7 @@ window.toolHasChanged = function(obj, meta)
 	    }
 	}
 	</script>
-	<script type="text/paperscript" canvas="cookieCutter2d" src="./scripts/cookiecutter.paper.js">
+		<script type="text/paperscript" canvas="cookieCutter2d" src="./scripts/cookiecutter.paper.js">
 	</script>
 	
 	

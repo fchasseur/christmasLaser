@@ -118,7 +118,7 @@ nav {
 nav ul {
   list-style: none;
 }
-nav li {
+nav  {
   display: inline-block;
 }
 nav a {
