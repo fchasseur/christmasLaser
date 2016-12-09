@@ -24,27 +24,26 @@
         
         </script>
     </head>
-    <body  oncontextMenu="return false">
+    <body  >
         <section role="main">
 	<div id="container">
 		<div id="toolbar" >
-			<a class="btn-toolbar select"> Select </a>
-			<a  class="btn-toolbar photo"> Photo </a>
-			<a id="freeform" class="btn-toolbar "> Libre </a>
+			<a class="btn-toolbar btn-toolbar-light select"> <img src="./images/select.png" width="22px" /> </a>
+			<a id="freeform" class="btn-toolbar btn-toolbar-light"> <img src="./images/pen.png" width="22px"  /> </a>
 			<div id="toolbar-freeform" class="hidden">
-			   <a href="#" class="pen" >Crayon</a>
-			   <a href="#" class="polyline" >Polylines</i></a>
+			   <a href="#" class="pen" ><img src="./images/pen.png" width="22px" /></a>
+			   <a href="#" class="polyline" ><img src="./images/polyline.png" width="22px"  /></i></a>
 			</div>
 		
 			
-			<a id="form" class="btn-toolbar" >Forme </a>
+			<a id="form" class="btn-toolbar btn-toolbar-light" ><img src="./images/formes.png" width="22px" /> </a>
 			<div id="toolbar-formes" class="hidden">
-			   <a href="#" class="star" id="star">Star</a>
-			   <a href="#" class="circle" id="circle" >Circle</i></a>
-			   <a href="#" class="flake" id="flake" >Flake</i></a>
+			   <a href="#" class="star" id="star"><img src="./images/star.png" width="22px" /></a>
+			   <a href="#" class="circle" id="circle" ><img src="./images/circle.png" width="22px" /></i></a>
+			   <a href="#" class="flake" id="flake" ><img src="./images/snowflake.png" width="22px" /></i></a>
 			</div>
-		
-			<a class="btn-toolbar save"> Save </a>
+			<a  class="btn-toolbar btn-toolbar-danger photo"> <img src="./images/camera.svg" width="22px" /> </a>
+			<a class="btn-toolbar btn-toolbar-primary save"> <img src="./images/save.svg" width="22px" /> </a>
 
 
 		</div>
@@ -76,12 +75,15 @@
 	   $('#freeform').toolbar({
 		content: '#toolbar-freeform',
 		event: 'click',
+		style:'light',
 		hideOnClick: true
 	});
  
  	 $('#form').toolbar({
 		content: '#toolbar-formes',
 		event: 'click',
+		style:'light',
+
 		hideOnClick: true
 	});
 

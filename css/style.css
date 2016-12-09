@@ -70,13 +70,16 @@ body {
     background-size: 22px 22px;
 }
 
-
-#loadBtn div
+.toolbar img 
 {
-	background: url('../images/camera.svg');
-    background-repeat: no-repeat;
-    background-position: top;
-    background-size: 22px 22px;
+		max-width: 20px;
+	max-height: 20px;
+}
+}
+.photo >img 
+{
+	max-width: 20px;
+	max-height: 20px;
 }
 
 #editBtn div

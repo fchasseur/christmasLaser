@@ -5,7 +5,7 @@
 }
 
 .btn-toolbar {
-  background: #364347;
+  background: #AAAAAA;
   width: 20px;
   height: 20px;
   text-align: center;
@@ -110,7 +110,7 @@
   color: white;
 }
 .btn-toolbar-dark {
-  background-color: #364347;
+  background-color: #aaa;
 }
 .btn-toolbar-dark.pressed {
   background-color: #5e696d;
@@ -375,19 +375,19 @@
   color: white;
 }
 .toolbar-dark {
-  background-color: #364347;
+  background-color: #AAAAAA;
 }
 .toolbar-dark.tool-top .arrow {
-  border-color: #364347 transparent transparent;
+  border-color: #AAAAAA transparent transparent;
 }
 .toolbar-dark.tool-bottom .arrow {
-  border-color: transparent transparent #364347;
+  border-color: transparent transparent #AAAAAA;
 }
 .toolbar-dark.tool-left .arrow {
-  border-color: transparent transparent transparent #364347;
+  border-color: transparent transparent transparent #AAAAAA;
 }
 .toolbar-dark.tool-right .arrow {
-  border-color: transparent #364347 transparent transparent;
+  border-color: transparent #AAAAAA transparent transparent;
 }
 .toolbar-dark .tool-item > .fa {
   color: white;
