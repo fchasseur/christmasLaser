@@ -135,8 +135,9 @@ body {
 }
 
 .pgGroupRow {
-    background-color: #E0ECFF;
+    background-color: #009dcd;
     font-weight: bold;
+    color:white;
 }
 
 .pgGroupCell {
