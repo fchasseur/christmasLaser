@@ -29,7 +29,10 @@
 	<div id="container">
 		<div id="toolbar" >
 			<a class="btn-toolbar btn-toolbar-light select"> <img src="./images/select.png" width="22px" /> </a>
-			<a id="freeform" class="btn-toolbar btn-toolbar-light"> <img src="./images/pen.png" width="22px"  /> </a>
+			<a class="btn-toolbar btn-toolbar-light move"> <img src="./images/move.svg" width="22px" /> </a>
+		
+
+			<a id="freeform" class="btn-toolbar btn-toolbar-light"> <img src="./images/penCat.svg" width="22px"  /> </a>
 			<div id="toolbar-freeform" class="hidden">
 			   <a href="#" class="pen" ><img src="./images/pen.png" width="22px" /></a>
 			   <a href="#" class="polyline" ><img src="./images/polyline.png" width="22px"  /></i></a>
@@ -38,9 +41,14 @@
 			
 			<a id="form" class="btn-toolbar btn-toolbar-light" ><img src="./images/formes.png" width="22px" /> </a>
 			<div id="toolbar-formes" class="hidden">
-			   <a href="#" class="star" id="star"><img src="./images/star.png" width="22px" /></a>
-			   <a href="#" class="circle" id="circle" ><img src="./images/circle.png" width="22px" /></i></a>
+			   <a href="#" class="star" id="star"><img src="./images/star.svg" width="22px" /></a>
+			   <a href="#" class="circle" id="circle" ><img src="./images/circle.svg" width="22px" /></i></a>
 			   <a href="#" class="flake" id="flake" ><img src="./images/snowflake.png" width="22px" /></i></a>
+
+			   <a href="#" class="tree" id="tree" ><img src="./images/tree.svg" width="22px" /></i></a>
+			  
+			   <a href="#" class="rectangle" id="rectangle" ><img src="./images/rectangle.svg" width="22px" /></i></a>
+			   <a href="#" class="ellipse" id="ellipse" ><img src="./images/ellipse.svg" width="22px" /></i></a>
 			</div>
 			<a  class="btn-toolbar btn-toolbar-danger photo"> <img src="./images/camera.svg" width="22px" /> </a>
 			<a class="btn-toolbar btn-toolbar-primary save"> <img src="./images/save.svg" width="22px" /> </a>
@@ -136,6 +144,26 @@ window.toolHasChanged = function(obj, meta)
 	    		
 	    		paper.changeTool("circle");
 	    });
+
+	    $(".move").click(function(event) {
+	    		
+	    		paper.changeTool("move");
+	    });
+
+	    $(".rectangle").click(function(event) {
+	    		
+	    		paper.changeTool("rectangle");
+	    });
+	    $(".ellipse").click(function(event) {
+	    		
+	    		paper.changeTool("ellipse");
+	    });
+
+	     $(".tree").click(function(event) {
+	    		
+	    		paper.changeTool("tree");
+	    });
+
 	    $(".flake").click(function(event) {
 	    		
 	    		paper.changeTool("flake");
