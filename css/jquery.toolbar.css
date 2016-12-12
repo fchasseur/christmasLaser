@@ -22,6 +22,10 @@
   background: #02baf2;
   cursor: pointer;
 }
+
+
+
+
 .btn-toolbar:hover > i {
   color: white;
 }

@@ -23,21 +23,22 @@ body {
 #toolbar
 {
 	position: absolute;
-	bottom: 40px;	
+	top: 10px;	
 	right: 50px;
 	height: 25px;
 }
+
 
  .smallPreview
 {
 	position: absolute;
 	clear: both;
-	top: 45px;	
-	right: 10px;
+	top: 115px;	
+	right: 50px;
 	background: transparent;
 	height: auto;
 	max-height: auto;
-	width: 300px;
+	width: 270px;
 	z-index: 100;
 	background: white;
 }
@@ -54,9 +55,14 @@ body {
 		display: block;
 	    vertical-align: bottom;
 	    float: left;
-	    margin: 10px;
+	    margin: 3px;
 
 }
+.selected
+ {
+ 	background: red;
+ }
+
 .button span
 {
 	margin-top: 20px;
@@ -132,12 +138,13 @@ body {
 .pgTable {
     border: solid 1px #95B8E7;
     border-spacing: 0;
+    width: 100%;
 }
 
 .pgGroupRow {
     background-color: #009dcd;
     font-weight: bold;
-    color:white;
+    counter-resetcolor:white;
 }
 
 .pgGroupCell {

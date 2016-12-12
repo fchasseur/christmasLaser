@@ -62,7 +62,6 @@ commonPathUpdate = function(val) {
             p.strokeColor = 'black';
             p.fillColor = "white";
             p.fillColor.alpha = 0.1;
-            p.strokeWidth = 3;
 
 
             break;
@@ -105,7 +104,7 @@ penTool.onMouseDrag = function(event) {
 penTool.onMouseUp = function(event) {
     path.simplify(10);
     
-    paper.changeTool("move");
+    $("#move").click();
 }
 
 
@@ -157,7 +156,7 @@ circleTool.onMouseUp = function(event) {
 
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
-    paper.changeTool("move");
+    $("#move").click();
 
 }
 
@@ -212,7 +211,7 @@ rectangleTool.onMouseUp = function(event) {
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
 
-    paper.changeTool("move");
+    $("#move").click();
 
 }
 
@@ -297,7 +296,7 @@ starTool.onMouseUp = function(event) {
 
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
-    paper.changeTool("move");
+    $("#move").click();
     //editTool.activate();
     //window.toolHasChanged(editTool.meta, editTool.toolValues)
 }
@@ -451,7 +450,7 @@ snowFlakeTool.onMouseUp = function(event) {
 
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
-    paper.changeTool("move");
+    $("#move").click();
     //editTool.activate();
     //window.toolHasChanged(editTool.meta, editTool.toolValues)
 }
@@ -538,7 +537,7 @@ treeTool.onMouseUp = function(event) {
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
 
-    paper.changeTool("move");
+    $("#move").click();
 
     //editTool.activate();
     //window.toolHasChanged(editTool.meta, editTool.toolValues)
@@ -595,7 +594,7 @@ ellipseTool.onMouseUp = function(event) {
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
 
-    paper.changeTool("move");
+    //$("#move").click();
 
 }
 
@@ -608,11 +607,15 @@ ellipseTool.onMouseUp = function(event) {
 
 
 var editTool = new Tool();
-editTool.meta = {};
-
-editTool.toolValues = {}
+editTool.meta = JSON.parse(JSON.stringify(pathMeta));;
+editTool.meta.laserType.group = editTool.meta.strokeWidth.group = "Edition"
+editTool.toolValues = {
+    laserType: "cut",
+    strokeWidth: 1
+}
 
 editTool.updateObj = function(val) {
+    debugger;
     editTool.selectedItem.updateObj(val)
 }
 editTool.onKeyUp = function(event) {
@@ -628,6 +631,7 @@ editTool.onMouseDown = function(event) {
     paper.settings.handleSize = 10;
     project.activeLayer.selected = false;
     editTool.selectedItem = event.item;
+    console.log(editTool.selectedItem);
     if (event.item) {
         event.item.selected = true;
         if (editTool.selectedItem.meta) {
@@ -666,14 +670,12 @@ editTool.onMouseDrag = function(event) {
         } else {
             if (segment) {
                 segment.point += event.delta;
-            } else {
-                editTool.selectedItem.position += event.delta;
-            }
+            } 
         }
     }
 }
 editTool.onMouseUp = function(event) {
-	editTool.selectedItem = null;
+	//editTool.selectedItem = null;
 }
 editTool.onMouseMove = function(event) {}
 
@@ -683,9 +685,12 @@ editTool.onMouseMove = function(event) {}
 
 
 var moveTool = new Tool();
-moveTool.meta = {};
-
-moveTool.toolValues = {}
+moveTool.meta = JSON.parse(JSON.stringify(pathMeta));;
+moveTool.meta.laserType.group = moveTool.meta.strokeWidth.group = "Déplacement"
+moveTool.toolValues = {
+    laserType: "cut",
+    strokeWidth: 1
+}
 
 moveTool.updateObj = function(val) {
     moveTool.selectedItem.updateObj(val)
@@ -794,7 +799,7 @@ polyLineTool.stopPath = function() {
     polyLineTool.myPath.updateObj(polyLineTool.myPath.toolValues)
     polyLineTool.myPath.closed = true;
     polyLineTool.c.visible = polyLineTool.line.visible = false;
-    paper.changeTool("move");
+    $("#move").click();
 
 }
 
@@ -879,13 +884,12 @@ polyLineTool.onMouseMove = function(event) {
 // Activate first tool
 
 
-polyLineTool.activate();
-window.toolHasChanged(polyLineTool.meta, polyLineTool.toolValues)
-
 paper.settings.handleSize = 10;
 paper.settings.hitTolerance = 20;
 /// Change tool
 paper.changeTool = function(t) {
+    project.activeLayer.selected = false;
+
     switch (t) {
         case "pen":
             penTool.activate();
@@ -977,3 +981,4 @@ paper.downloadAsSVG = function(fileName) {
     link.href = url;
     link.click();
 }
+

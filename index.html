@@ -28,36 +28,37 @@
         <section role="main">
 	<div id="container">
 		<div id="toolbar" >
-			<a class="btn-toolbar btn-toolbar-light select"> <img src="./images/select.png" width="22px" /> </a>
-			<a class="btn-toolbar btn-toolbar-light move"> <img src="./images/move.svg" width="22px" /> </a>
+			<a class="btn-toolbar btn-toolbar-light select btn selectable" id="select"> <img src="./images/select.png" width="22px" /> </a>
+			<a class="btn-toolbar btn-toolbar-light move btn selectable" id="move"> <img src="./images/move.svg" width="22px" /> </a>
 		
 
-			<a id="freeform" class="btn-toolbar btn-toolbar-light"> <img src="./images/penCat.svg" width="22px"  /> </a>
+			<a id="freeform" class="btn-toolbar btn-toolbar-light "> <img src="./images/penCat.svg" width="22px"  /> </a>
 			<div id="toolbar-freeform" class="hidden">
-			   <a href="#" class="pen" ><img src="./images/pen.png" width="22px" /></a>
-			   <a href="#" class="polyline" ><img src="./images/polyline.png" width="22px"  /></i></a>
+			   <a href="#" class="pen btn" id="pen" ><img src="./images/pen.png" width="22px" /></a>
+			   <a href="#" class="polyline btn" id="polyline"><img src="./images/polyline.png" width="22px"  /></i></a>
 			</div>
 		
 			
 			<a id="form" class="btn-toolbar btn-toolbar-light" ><img src="./images/formes.png" width="22px" /> </a>
 			<div id="toolbar-formes" class="hidden">
-			   <a href="#" class="star" id="star"><img src="./images/star.svg" width="22px" /></a>
-			   <a href="#" class="circle" id="circle" ><img src="./images/circle.svg" width="22px" /></i></a>
-			   <a href="#" class="flake" id="flake" ><img src="./images/snowflake.png" width="22px" /></i></a>
+			   <a href="#" class="star btn" id="star"><img src="./images/star.svg" width="22px" /></a>
+			   <a href="#" class="circle btn" id="circle" ><img src="./images/circle.svg" width="22px" /></i></a>
+			   <a href="#" class="flake btn" id="flake" ><img src="./images/snowflake.png" width="22px" /></i></a>
 
-			   <a href="#" class="tree" id="tree" ><img src="./images/tree.svg" width="22px" /></i></a>
+			   <a href="#" class="tree btn" id="tree" ><img src="./images/tree.svg" width="22px" /></i></a>
 			  
-			   <a href="#" class="rectangle" id="rectangle" ><img src="./images/rectangle.svg" width="22px" /></i></a>
-			   <a href="#" class="ellipse" id="ellipse" ><img src="./images/ellipse.svg" width="22px" /></i></a>
+			   <a href="#" class="rectangle btn" id="rectangle" ><img src="./images/rectangle.svg" width="22px" /></i></a>
+			   <a href="#" class="ellipse btn" id="ellipse" ><img src="./images/ellipse.svg" width="22px" /></i></a>
 			</div>
-			<a  class="btn-toolbar btn-toolbar-danger photo"> <img src="./images/camera.svg" width="22px" /> </a>
-			<a class="btn-toolbar btn-toolbar-primary save"> <img src="./images/save.svg" width="22px" /> </a>
+			<a  class="btn-toolbar btn-toolbar-danger photo btn" id="photo"> <img src="./images/camera.svg" width="22px" /> </a>
+			<a class="btn-toolbar btn-toolbar-primary save btn" id="save"> <img src="./images/save.svg" width="22px" /> </a>
 
 
 		</div>
 		<canvas id="cookieCutter2d"  class="bigView"></canvas>
 		<div  class="smallPreview" >
-			<div id='toolProp'/>
+			<div id='toolProp' style="text-align:center">
+			</div>
 			<div id='propGrid'/>
 		</div>
 
@@ -80,20 +81,52 @@
 	<script type="text/javascript">
 
 
-	   $('#freeform').toolbar({
+	  var tt =  $('#freeform').toolbar({
 		content: '#toolbar-freeform',
 		event: 'click',
 		style:'light',
-		hideOnClick: true
+		hideOnClick: false,
+		position:"bottom"
 	});
  
- 	 $('#form').toolbar({
+ 	var t =  $('#form').toolbar({
 		content: '#toolbar-formes',
 		event: 'click',
 		style:'light',
-
-		hideOnClick: true
+		position:"bottom",
+		hideOnClick: false
 	});
+
+ 	$('#form').on('toolbarShown',
+	   function( event ) {
+	   		$(".selectable").removeClass("pressed");
+		   	if($("#freeform").is(".pressed"))
+		      $("#freeform").click();
+	   });
+ 	  $('#freeform').on('toolbarShown',
+		   function( event ) {
+	   		$(".selectable").removeClass("pressed");
+			   	if($("#form").is(".pressed"))
+		    		  $("#form").click();
+   });
+
+
+ 	$('.selectable').click(
+	   function( event ) {
+	   		$(".selectable").removeClass("pressed");
+	   		$(this).addClass("pressed");
+
+		   	if($("#freeform").is(".pressed"))
+		      $("#freeform").click();
+		   	if($("#form").is(".pressed"))
+    		  $("#form").click();
+
+   });
+
+
+
+
+
 
 	var currentPoints = [], simplePoints = [];
 	var intersectCount = 0;
@@ -133,54 +166,19 @@ window.toolHasChanged = function(obj, meta)
 	    		$("#cookieName").val("");
 	    });
 
+	    $(".btn").click(function(e){
+			if(this.id && this.id != "")
+			{
+			
+				$(".btn").removeClass("selected");
+				$(this).addClass("selected");
+				paper.changeTool(this.id);
+				$("#toolbarImg").attr("src",$(this).find("img").attr("src"));
 
+			}
 
- 		$(".star").click(function(event) {
-	    		
-	    		paper.changeTool("star");
-	    });
-
- 		$(".circle").click(function(event) {
-	    		
-	    		paper.changeTool("circle");
-	    });
-
-	    $(".move").click(function(event) {
-	    		
-	    		paper.changeTool("move");
 	    });
 
-	    $(".rectangle").click(function(event) {
-	    		
-	    		paper.changeTool("rectangle");
-	    });
-	    $(".ellipse").click(function(event) {
-	    		
-	    		paper.changeTool("ellipse");
-	    });
-
-	     $(".tree").click(function(event) {
-	    		
-	    		paper.changeTool("tree");
-	    });
-
-	    $(".flake").click(function(event) {
-	    		
-	    		paper.changeTool("flake");
-	    });
- 	   $(".pen").click(function(event) {
-	    		
-	    		paper.changeTool("pen");
-	    });
- 	   $(".select").click(function(event) {
-	    		
-	    		paper.changeTool("select");
-	    });
-
- 	   $(".polyline").click(function(event) {
-	    		
-	    		paper.changeTool("polyline");
-	    });
 
 
 	    $("#dialogLoad").dialog({ height: 600, width: 'auto', modal: true, title: "Camera", dialogClass: "no-close", autoOpen: false });
@@ -249,49 +247,11 @@ window.toolHasChanged = function(obj, meta)
 	       paper.changeTool("select")
 	    });
 	
+
+		
 	});
-	function postPoints(points,simplePoints,intersectionCount) {
-	    currentPoints = points;
-	    currentSimplePoints = simplePoints;
-	    intersectCount = intersectionCount;
-	}
-	var cloned3DView;
-	function setMode(m) {
-	    
-	    console.log(mode + "-->" + m);
-
-	    mode = m;
-	    $("#toolbar .toggleButton").removeClass("selected");
-        $("#cookieCutter2d").removeClass();
-
-		switch (mode) {
-	        case "EDIT":
-	            $("#cookieCutter2d").css("cursor", "crosshair");
-	            $("#editBtn").addClass("selected");
-        		$("#cookieCutter2d").addClass("bigView");
-	            break;
-	        case "PEN":
-	            $("#cookieCutter2d").css("cursor", "crosshair");
-	             $("#editBtn").addClass("selected");
-        		$("#cookieCutter2d").addClass("bigView");
-		        break;
-	        case "PREVIEW":
-	        break
-	        case "DELETE":
-	        	$("#cookieCutter2d").css("cursor", "no-drop");
-	            $("#deleteBtn").addClass("selected");
-        		$("#cookieCutter2d").addClass("bigView");
-	    		break;
-    		case "ADD": 
-	    		$("#cookieCutter2d").css("cursor", "crosshair");
-	             $("#addBtn").addClass("selected");
-	             paper.restart();
-	             break;
-		    case "RESTART":
-		        paper.clearAndRestart();
-		        break;
-	    }
-	}
+	
+	
 	</script>
 		<script type="text/paperscript" canvas="cookieCutter2d" src="./scripts/cookiecutter.paper.js">
 	</script>
