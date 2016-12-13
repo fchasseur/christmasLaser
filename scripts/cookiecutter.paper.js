@@ -37,10 +37,12 @@ var pathMeta = {
             text: "12",
             value: '12'
         }]
-    }
+    },
+    info : { 
+        name : " ", group : "Outils", type:"label"}
 };
 
-commonPathUpdate = function(val) {
+commonPathUpdate = function(val,info) {
     var p = this;
     p.laserType = val.laserType;
     p.strokeWidth = val.strokeWidth;
@@ -68,6 +70,8 @@ commonPathUpdate = function(val) {
 
     }
     p.toolValues = val;
+    if( info)
+        p.toolValues.info = info;
 }
 
 
@@ -104,7 +108,7 @@ penTool.onMouseDrag = function(event) {
 penTool.onMouseUp = function(event) {
     path.simplify(10);
     
-    $("#move").click();
+    //$("#move").click();
 }
 
 
@@ -156,7 +160,7 @@ circleTool.onMouseUp = function(event) {
 
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
-    $("#move").click();
+    //$("#move").click();
 
 }
 
@@ -211,7 +215,7 @@ rectangleTool.onMouseUp = function(event) {
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
 
-    $("#move").click();
+    //$("#move").click();
 
 }
 
@@ -296,7 +300,7 @@ starTool.onMouseUp = function(event) {
 
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
-    $("#move").click();
+    //$("#move").click();
     //editTool.activate();
     //window.toolHasChanged(editTool.meta, editTool.toolValues)
 }
@@ -450,7 +454,7 @@ snowFlakeTool.onMouseUp = function(event) {
 
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
-    $("#move").click();
+    //$("#move").click();
     //editTool.activate();
     //window.toolHasChanged(editTool.meta, editTool.toolValues)
 }
@@ -537,7 +541,7 @@ treeTool.onMouseUp = function(event) {
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
 
-    $("#move").click();
+    //$("#move").click();
 
     //editTool.activate();
     //window.toolHasChanged(editTool.meta, editTool.toolValues)
@@ -608,15 +612,17 @@ ellipseTool.onMouseUp = function(event) {
 
 var editTool = new Tool();
 editTool.meta = JSON.parse(JSON.stringify(pathMeta));;
-editTool.meta.laserType.group = editTool.meta.strokeWidth.group = "Edition"
+editTool.meta.laserType.group = editTool.meta.strokeWidth.group = editTool.meta.info.group = "Edition"
 editTool.toolValues = {
     laserType: "cut",
-    strokeWidth: 1
+    strokeWidth: 1,
+    info  :"Click --> Sélection <br/>Click + Drag --> Déplacer un point <br/>   Shift+click --> Retirer un point <br/>"
 }
 
 editTool.updateObj = function(val) {
     debugger;
-    editTool.selectedItem.updateObj(val)
+    editTool.selectedItem.updateObj(val, editTool.toolValues.info);
+
 }
 editTool.onKeyUp = function(event) {
     if (event.key == 'delete') {
@@ -635,6 +641,7 @@ editTool.onMouseDown = function(event) {
     if (event.item) {
         event.item.selected = true;
         if (editTool.selectedItem.meta) {
+            editTool.selectedItem.toolValues.info = editTool.toolValues.info
             window.toolHasChanged(editTool.selectedItem.meta, editTool.selectedItem.toolValues);
         } else {
             window.toolHasChanged({}, {})
@@ -686,14 +693,13 @@ editTool.onMouseMove = function(event) {}
 
 var moveTool = new Tool();
 moveTool.meta = JSON.parse(JSON.stringify(pathMeta));;
-moveTool.meta.laserType.group = moveTool.meta.strokeWidth.group = "Déplacement"
+moveTool.meta.laserType.group = moveTool.meta.strokeWidth.group= moveTool.meta.info.group = "Déplacement"
 moveTool.toolValues = {
-    laserType: "cut",
-    strokeWidth: 1
+    info :"Click --> Sélection <br/> Alt+click --> Mettre en arrière plan <br/> Ctrl+click --> Changer la taille"
 }
 
 moveTool.updateObj = function(val) {
-    moveTool.selectedItem.updateObj(val)
+  //  moveTool.selectedItem.updateObj(val)
 }
 moveTool.onKeyUp = function(event) {
     if (event.key == 'delete') {
@@ -726,19 +732,9 @@ moveTool.onMouseDown = function(event) {
             moveTool.selectedItem.sendToBack();
             if (raster)
                 raster.sendToBack();
-        } else {
-            if (moveTool.selectedItem.meta) {
-                window.toolHasChanged(moveTool.selectedItem.meta, moveTool.selectedItem.toolValues);
-            } else {
-                window.toolHasChanged({}, {})
-            }
+        } 
 
-        }
-
-    } else {
-        window.toolHasChanged({}, {});
-
-    }
+    } 
 }
 moveTool.onMouseDrag = function(event) {
 
@@ -799,7 +795,7 @@ polyLineTool.stopPath = function() {
     polyLineTool.myPath.updateObj(polyLineTool.myPath.toolValues)
     polyLineTool.myPath.closed = true;
     polyLineTool.c.visible = polyLineTool.line.visible = false;
-    $("#move").click();
+    //$("#move").click();
 
 }
 
@@ -882,7 +878,8 @@ polyLineTool.onMouseMove = function(event) {
 
 
 // Activate first tool
-
+ polyLineTool.activate();
+ window.toolHasChanged(polyLineTool.meta, polyLineTool.toolValues)
 
 paper.settings.handleSize = 10;
 paper.settings.hitTolerance = 20;
