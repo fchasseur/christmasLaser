@@ -5,6 +5,8 @@ var hitOptions = {
 };
 
 var pathMeta = {
+    info : { 
+        name : " ", group : "Info", type:"label"},
     laserType: {
         name: 'Type',
         group: 'Outils',
@@ -26,7 +28,7 @@ var pathMeta = {
         type: 'options',
         options: [{
             text: "1",
-            value: '1'
+            value: '0.25'
         }, {
             text: "3",
             value: '3'
@@ -38,8 +40,7 @@ var pathMeta = {
             value: '12'
         }]
     },
-    info : { 
-        name : " ", group : "Outils", type:"label"}
+    
 };
 
 commonPathUpdate = function(val,info) {
@@ -51,7 +52,7 @@ commonPathUpdate = function(val,info) {
             p.strokeColor = 'red';
             p.fillColor = 'white';
             p.fillColor.alpha = 0.1;
-            p.strokeWidth = 1;
+            p.strokeWidth = 0.25;
             break;
 
         case "applat":
@@ -86,7 +87,8 @@ penTool.meta = JSON.parse(JSON.stringify(pathMeta));
 penTool.meta.laserType.group = penTool.meta.strokeWidth.group = "Crayon"
 penTool.toolValues = {
     laserType: "engraving",
-    strokeWidth: 1
+    strokeWidth: 1,
+    info : "Garder le bouton de la souris pour dessiner"
 }
 
 penTool.updateObj = commonPathUpdate;
@@ -153,6 +155,7 @@ circleTool.onMouseUp = function(event) {
         radius: event.delta.length,
         fillColor: "black"
     });
+    path.flatten (2);
     path.meta = circleTool.meta;
     path.toolValues = circleTool.toolValues;
     path.updateObj = circleTool.updateObj;
@@ -531,6 +534,7 @@ treeTool.onMouseUp = function(event) {
     path.position = treeTool.centerPoint;
     path.scale(2 * (treeTool.centerPoint - event.point).length / path.bounds.width);
     path.fillColor = "black"
+    path.flatten (2);
 
 
     path.meta = treeTool.meta;
@@ -612,11 +616,11 @@ ellipseTool.onMouseUp = function(event) {
 
 var editTool = new Tool();
 editTool.meta = JSON.parse(JSON.stringify(pathMeta));;
-editTool.meta.laserType.group = editTool.meta.strokeWidth.group = editTool.meta.info.group = "Edition"
+editTool.meta.laserType.group = editTool.meta.strokeWidth.group =  "Edition"
 editTool.toolValues = {
     laserType: "cut",
     strokeWidth: 1,
-    info  :"Click --> Sélection <br/>Click + Drag --> Déplacer un point <br/>   Shift+click --> Retirer un point <br/>"
+    info  :"Click --> Sélection <br/>Click + Drag --> Déplacer un point <br/>   Shift+click --> Retirer un point <br/> [Delete] pour supprimer la forme",
 }
 
 editTool.updateObj = function(val) {
@@ -693,7 +697,7 @@ editTool.onMouseMove = function(event) {}
 
 var moveTool = new Tool();
 moveTool.meta = JSON.parse(JSON.stringify(pathMeta));;
-moveTool.meta.laserType.group = moveTool.meta.strokeWidth.group= moveTool.meta.info.group = "Déplacement"
+moveTool.meta.laserType.group = moveTool.meta.strokeWidth.group=  "Déplacement"
 moveTool.toolValues = {
     info :"Click --> Sélection <br/> Alt+click --> Mettre en arrière plan <br/> Ctrl+click --> Changer la taille"
 }
@@ -782,7 +786,8 @@ polyLineTool.line = new Path.Line({
 polyLineTool.meta = JSON.parse(JSON.stringify(pathMeta));;
 polyLineTool.toolValues = {
     laserType: "cut",
-    strokeWidth: 1
+    strokeWidth: 1,
+    info : "Click pour ajouter un segment. <br/> Click + Drag pour dessiner <br/> <br/> Terminer en cliquant sur le point de départ."
 
 }
 
@@ -878,8 +883,8 @@ polyLineTool.onMouseMove = function(event) {
 
 
 // Activate first tool
- polyLineTool.activate();
- window.toolHasChanged(polyLineTool.meta, polyLineTool.toolValues)
+ moveTool.activate();
+ window.toolHasChanged(moveTool.meta, moveTool.toolValues)
 
 paper.settings.handleSize = 10;
 paper.settings.hitTolerance = 20;
@@ -968,13 +973,19 @@ paper.downloadAsSVG = function(fileName) {
     if (!fileName) {
         fileName = "paperjs_example.svg"
     }
+    for (var i = paper.project.activeLayer.children.length - 1; i >= 0; i--) {
+        if(paper.project.activeLayer.children[i].fillColor)
+            {
+                paper.project.activeLayer.children[i].fillColor.alpha = 1;
+            }
+    };
 
     var url = "data:image/svg+xml;utf8," + encodeURIComponent(paper.project.exportSVG({
         asString: true
     }));
 
     var link = document.createElement("a");
-    link.download = fileName;
+    link.download = fileName  + ".svg";
     link.href = url;
     link.click();
 }

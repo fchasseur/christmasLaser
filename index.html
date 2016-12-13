@@ -28,9 +28,8 @@
         <section role="main">
 	<div id="container">
 		<div id="toolbar" >
-			<a class="btn-toolbar btn-toolbar-light select btn selectable" id="select"> <img src="./images/select.png" width="22px" /> </a>
 			<a class="btn-toolbar btn-toolbar-light move btn selectable" id="move"> <img src="./images/move.svg" width="22px" /> </a>
-		
+			<a class="btn-toolbar btn-toolbar-light select btn selectable" id="select"> <img src="./images/select.png" width="22px" /> </a>
 
 			<a id="freeform" class="btn-toolbar btn-toolbar-light "> <img src="./images/penCat.svg" width="22px"  /> </a>
 			<div id="toolbar-freeform" class="hidden">
@@ -161,7 +160,6 @@ window.toolHasChanged = function(obj, meta)
 	    $("#confirmSave").click(function(event) {
 	    		
 	    		paper.downloadAsSVG($("#cookieName").val());
-	    		setMode("EDIT");
 	    		$( "#dialog" ).dialog("close");
 	    		$("#cookieName").val("");
 	    });
@@ -248,7 +246,7 @@ window.toolHasChanged = function(obj, meta)
 	    });
 	
 
-		
+
 	});
 	
 	
