@@ -751,7 +751,6 @@ moveTool.onMouseDrag = function(event) {
     }
 }
 moveTool.onMouseUp = function(event) {
-	moveTool.selectedItem = null;
 }
 moveTool.onMouseMove = function(event) {}
 
