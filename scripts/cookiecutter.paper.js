@@ -699,7 +699,7 @@ var moveTool = new Tool();
 moveTool.meta = JSON.parse(JSON.stringify(pathMeta));;
 moveTool.meta.laserType.group = moveTool.meta.strokeWidth.group=  "Déplacement"
 moveTool.toolValues = {
-    info :"Click --> Sélection <br/> Alt+click --> Mettre en arrière plan <br/> Ctrl+click --> Changer la taille"
+    info :"Click --> Sélection <br/> Shift + click --> Mettre en arrière plan <br/> Ctrl+click --> Changer la taille <br/> Les flèches pour la rotation"
 }
 
 moveTool.updateObj = function(val) {
@@ -731,7 +731,7 @@ moveTool.onMouseDown = function(event) {
     moveTool.selectedItem = event.item;
     if (event.item) {
         event.item.selected = true;
-        if (event.modifiers.option) {
+        if (event.modifiers.shift) {
 
             moveTool.selectedItem.sendToBack();
             if (raster)
