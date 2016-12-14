@@ -63,7 +63,7 @@ commonPathUpdate = function(val,info) {
             break
         case "engraving":
             if(p.strokeWidth == 0.25)
-                 p.strokeColor = 'green';
+                 p.strokeColor = '#00FF00';
             else
                 p.strokeColor = "black";
             p.fillColor = "white";
