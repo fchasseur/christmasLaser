@@ -327,7 +327,7 @@ starTool.onMouseDrag = function(event) {
         fillColor: "black"
     }).removeOnDrag().removeOnUp();
     path.meta = starTool.meta;
-    path.toolValues = starTool.toolValues;
+    path.toolValues =  starTool.toolValues;
     path.updateObj = starTool.updateObj;
 
 
@@ -347,13 +347,15 @@ starTool.onMouseUp = function(event) {
         radius2: event.delta.length * factor,
         fillColor: "black"
     });
-    path.meta = starTool.meta;
-    path.toolValues = starTool.toolValues;
+    path.meta = JSON.parse(JSON.stringify(pathMeta));;
+    path.meta.laserType.group = path.meta.strokeWidth.group = "Etoile"
+
     path.updateObj = starTool.updateObj;
-
-
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
+    
+    path.toolValues = {laserType:  starTool.toolValues.laserType, strokeWidth:starTool.toolValues.strokeWidth};
+
     //$("#move").click();
     //editTool.activate();
     //window.toolHasChanged(editTool.meta, editTool.toolValues)
@@ -528,6 +530,9 @@ snowFlakeTool.onMouseUp = function(event) {
     //editTool.activate();
     //window.toolHasChanged(editTool.meta, editTool.toolValues)
      path = null;
+
+
+
 }
 
 
@@ -729,7 +734,7 @@ ellipseTool.onKeyDown = function(event){
 
 var editTool = new Tool();
 editTool.meta = JSON.parse(JSON.stringify(pathMeta));;
-editTool.meta.laserType.group = editTool.meta.strokeWidth.group =  "Edition"
+editTool.meta.laserType.group = editTool.meta.strokeWidth.group =  editTool.meta.info.group =  "Edition"
 editTool.toolValues = {
     laserType: "cut",
     strokeWidth: 1,
@@ -737,8 +742,7 @@ editTool.toolValues = {
 }
 
 editTool.updateObj = function(val) {
-    debugger;
-    editTool.selectedItem.updateObj(val, editTool.toolValues.info);
+   editTool.selectedItem.updateObj(val, editTool.toolValues.info);
 
 }
 editTool.onKeyUp = function(event) {
@@ -767,11 +771,11 @@ editTool.onMouseDown = function(event) {
     paper.settings.handleSize = 10;
     project.activeLayer.selected = false;
     editTool.selectedItem = event.item;
-    console.log(editTool.selectedItem);
     if (event.item) {
         event.item.selected = true;
         if (editTool.selectedItem.meta) {
             editTool.selectedItem.toolValues.info = editTool.toolValues.info
+            editTool.selectedItem.meta.info.group = "Edition";
             window.toolHasChanged(editTool.selectedItem.meta, editTool.selectedItem.toolValues);
         } else {
             window.toolHasChanged({}, {})
@@ -823,13 +827,13 @@ editTool.onMouseMove = function(event) {}
 
 var moveTool = new Tool();
 moveTool.meta = JSON.parse(JSON.stringify(pathMeta));;
-moveTool.meta.laserType.group = moveTool.meta.strokeWidth.group=  "Déplacement"
+moveTool.meta.laserType.group = moveTool.meta.strokeWidth.group= moveTool.meta.info.group = "Déplacement";
 moveTool.toolValues = {
     info :"Click --> Sélection <br/> Shift + click --> Mettre en arrière plan <br/> Ctrl+click --> Changer la taille <br/> Les flèches   --> rotation"
 }
 
 moveTool.updateObj = function(val) {
-  //  moveTool.selectedItem.updateObj(val)
+    moveTool.selectedItem.updateObj(val,moveTool.toolValues.info)
 }
 moveTool.onKeyUp = function(event) {
     if (event.key == 'delete') {
@@ -858,6 +862,14 @@ moveTool.onMouseDown = function(event) {
     moveTool.selectedItem = event.item;
     if (event.item) {
         event.item.selected = true;
+         if (moveTool.selectedItem.meta) {
+            moveTool.selectedItem.meta.info.group = "Déplacement";
+            moveTool.selectedItem.toolValues.info = editTool.toolValues.info
+            window.toolHasChanged(moveTool.selectedItem.meta, moveTool.selectedItem.toolValues);
+        } 
+
+
+
         if (event.modifiers.shift) {
 
             moveTool.selectedItem.sendToBack();
