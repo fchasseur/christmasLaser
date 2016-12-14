@@ -353,7 +353,7 @@ starTool.onMouseUp = function(event) {
     path.updateObj = starTool.updateObj;
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
-    
+
     path.toolValues = {laserType:  starTool.toolValues.laserType, strokeWidth:starTool.toolValues.strokeWidth};
 
     //$("#move").click();
@@ -746,7 +746,7 @@ editTool.updateObj = function(val) {
 
 }
 editTool.onKeyUp = function(event) {
-    if (event.key == 'delete') {
+    if ((event.key == 'delete') || (event.key == 'backspace')) {
         if (editTool.selectedItem) {
             editTool.selectedItem.remove();
             editTool.selectedItem = null;
@@ -836,8 +836,8 @@ moveTool.updateObj = function(val) {
     moveTool.selectedItem.updateObj(val,moveTool.toolValues.info)
 }
 moveTool.onKeyUp = function(event) {
-    if (event.key == 'delete') {
-        if (moveTool.selectedItem) {
+     if ((event.key == 'delete') || (event.key == 'backspace')) {
+      if (moveTool.selectedItem) {
             moveTool.selectedItem.remove();
             moveTool.selectedItem = null;
         }
