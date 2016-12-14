@@ -62,7 +62,10 @@ commonPathUpdate = function(val,info) {
 
             break
         case "engraving":
-            p.strokeColor = 'black';
+            if(p.strokeWidth == 0.25)
+                 p.strokeColor = 'green';
+            else
+                p.strokeColor = "black";
             p.fillColor = "white";
             p.fillColor.alpha = 0.1;
 
@@ -109,10 +112,26 @@ penTool.onMouseDrag = function(event) {
 }
 penTool.onMouseUp = function(event) {
     path.simplify(10);
+    path = null;
     
     //$("#move").click();
 }
 
+
+
+penTool.onKeyDown = function(event){
+
+     if( event.key == "escape")
+        {
+            if(path)
+            {
+                path.remove();
+            }
+            // Remove item
+            $("#move").click();
+
+        }
+}
 
 
 //------------------------------------------------------------------------------
@@ -164,9 +183,25 @@ circleTool.onMouseUp = function(event) {
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
     //$("#move").click();
+     path = null;
 
 }
 
+
+
+circleTool.onKeyDown = function(event){
+
+     if( event.key == "escape")
+        {
+            if(path)
+            {
+                path.remove();
+            }
+            // Remove item
+            $("#move").click();
+
+        }
+}
 
 
 
@@ -219,7 +254,23 @@ rectangleTool.onMouseUp = function(event) {
     path.updateObj(val);
 
     //$("#move").click();
+     path = null;
 
+}
+
+
+rectangleTool.onKeyDown = function(event){
+
+     if( event.key == "escape")
+        {
+            if(path)
+            {
+                path.remove();
+            }
+            // Remove item
+            $("#move").click();
+
+        }
 }
 
 
@@ -306,9 +357,25 @@ starTool.onMouseUp = function(event) {
     //$("#move").click();
     //editTool.activate();
     //window.toolHasChanged(editTool.meta, editTool.toolValues)
+     path = null;
 }
 
 
+
+
+starTool.onKeyDown = function(event){
+
+     if( event.key == "escape")
+        {
+            if(path)
+            {
+                path.remove();
+            }
+            // Remove item
+            $("#move").click();
+
+        }
+}
 
 
 
@@ -460,8 +527,24 @@ snowFlakeTool.onMouseUp = function(event) {
     //$("#move").click();
     //editTool.activate();
     //window.toolHasChanged(editTool.meta, editTool.toolValues)
+     path = null;
 }
 
+
+
+snowFlakeTool.onKeyDown = function(event){
+
+     if( event.key == "escape")
+        {
+            if(path)
+            {
+                path.remove();
+            }
+            // Remove item
+            $("#move").click();
+
+        }
+}
 
 
 //------------------------------
@@ -544,13 +627,28 @@ treeTool.onMouseUp = function(event) {
 
     var val = $('#propGrid').jqPropertyGrid('get');
     path.updateObj(val);
-
+    path = null;
     //$("#move").click();
 
     //editTool.activate();
     //window.toolHasChanged(editTool.meta, editTool.toolValues)
 }
 
+
+
+treeTool.onKeyDown = function(event){
+
+     if( event.key == "escape")
+        {
+            if(path)
+            {
+                path.remove();
+            }
+            // Remove item
+            $("#move").click();
+
+        }
+}
 
 
 
@@ -603,9 +701,24 @@ ellipseTool.onMouseUp = function(event) {
     path.updateObj(val);
 
     //$("#move").click();
+     path = null;
 
 }
 
+
+ellipseTool.onKeyDown = function(event){
+
+     if( event.key == "escape")
+        {
+            if(path)
+            {
+                path.remove();
+            }
+            // Remove item
+            $("#move").click();
+
+        }
+}
 
 
 
@@ -635,8 +748,21 @@ editTool.onKeyUp = function(event) {
             editTool.selectedItem = null;
         }
     }
+     if( event.key == "escape")
+        {
+            if(polyLineTool.myPath)
+            {
+                polyLineTool.myPath.remove();
+            }
+             polyLineTool.c.visible = polyLineTool.line.visible = false;
+
+            // Remove item
+            $("#move").click();
+        }
 }
-editTool.onKeyDown = function(event) {}
+editTool.onKeyDown = function(event) {
+
+}
 editTool.onMouseDown = function(event) {
     paper.settings.handleSize = 10;
     project.activeLayer.selected = false;
@@ -699,7 +825,7 @@ var moveTool = new Tool();
 moveTool.meta = JSON.parse(JSON.stringify(pathMeta));;
 moveTool.meta.laserType.group = moveTool.meta.strokeWidth.group=  "Déplacement"
 moveTool.toolValues = {
-    info :"Click --> Sélection <br/> Shift + click --> Mettre en arrière plan <br/> Ctrl+click --> Changer la taille <br/> Les flèches pour la rotation"
+    info :"Click --> Sélection <br/> Shift + click --> Mettre en arrière plan <br/> Ctrl+click --> Changer la taille <br/> Les flèches   --> rotation"
 }
 
 moveTool.updateObj = function(val) {
@@ -724,6 +850,7 @@ moveTool.onKeyDown = function(event) {
             moveTool.selectedItem.rotate(1);
         }
     }
+
 }
 moveTool.onMouseDown = function(event) {
     paper.settings.handleSize = 1;
@@ -874,7 +1001,21 @@ polyLineTool.onMouseMove = function(event) {
         polyLineTool.line.lastSegment.point = event.point;
     }
 }
+polyLineTool.onKeyDown = function(event){
 
+     if( event.key == "escape")
+        {
+            if(polyLineTool.myPath)
+            {
+                polyLineTool.myPath.remove();
+            }
+             polyLineTool.c.visible = polyLineTool.line.visible = false;
+
+            // Remove item
+            $("#move").click();
+
+        }
+}
 
 
 //------------------------------
