@@ -1114,8 +1114,8 @@ function handleImage(image) {
     }
     raster = new Raster(image);
     //raster.fitBounds(view.bounds, false);
-    raster.scale(0.7);
-    raster.position = new Point(view.bounds.width / 2, raster.bounds.height / 2 + 20);
+    raster.scale(2);
+    raster.position = new Point(view.bounds.width / 2, 500);
     raster.sendToBack();
 }
 
