@@ -1113,7 +1113,7 @@ function handleImage(image) {
         raster.remove();
     }
     raster = new Raster(image);
-    raster.fitBounds(view.bounds, false);
+    //raster.fitBounds(view.bounds, false);
     raster.scale(0.7);
     raster.position = new Point(view.bounds.width / 2, raster.bounds.height / 2 + 20);
     raster.sendToBack();
